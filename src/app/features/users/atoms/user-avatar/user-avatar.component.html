@@ -1,1 +1,17 @@
-<p>user-avatar works!</p>
+<div class="user-avatar" 
+     [ngClass]="[size, active ? 'active' : 'inactive']">
+  <ng-container *ngIf="photoUrl && photoUrl !== ''; else initialsTemplate">
+    <img [src]="photoUrl" [alt]="name + ' ' + lastName">
+  </ng-container>
+  
+  <ng-template #initialsTemplate>
+    <div class="avatar-initials">{{ initials }}</div>
+  </ng-template>
+  
+  <button *ngIf="showEditButton" 
+          class="edit-photo-button"
+          (click)="onEditClick()"
+          title="Cambiar foto">
+    <app-icon name="photo_camera"></app-icon>
+  </button>
+</div>

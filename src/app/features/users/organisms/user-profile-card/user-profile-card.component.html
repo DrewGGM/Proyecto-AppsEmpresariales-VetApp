@@ -1,0 +1,43 @@
+<div class="profile-card" *ngIf="user">
+  <div class="profile-status">
+    <app-status-indicator 
+      [active]="user.active"
+      [showLabel]="true"
+      size="medium">
+    </app-status-indicator>
+  </div>
+  
+  <div class="profile-actions" *ngIf="canEdit">
+    <app-button 
+      variant="primary" 
+      size="sm"
+      (buttonClick)="onEdit()">
+      <app-icon name="edit"></app-icon>
+      <span>Editar</span>
+    </app-button>
+    
+    <app-button 
+      variant="danger" 
+      size="sm"
+      (buttonClick)="onDelete()">
+      <app-icon name="delete"></app-icon>
+      <span>Eliminar</span>
+    </app-button>
+  </div>
+  
+  <div class="profile-content">
+    <div class="profile-avatar">
+      <app-user-avatar
+        [name]="user.name"
+        [lastName]="user.lastName"
+        [photoUrl]="user.photoUrl"
+        [active]="user.active"
+        [showEditButton]="canEdit"
+        size="large"
+        (editPhoto)="onEditPhoto()">
+      </app-user-avatar>
+    </div>
+    
+    <app-user-info-card [user]="user"></app-user-info-card>
+  </div>
+</div>

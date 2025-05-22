@@ -1,0 +1,93 @@
+// ========================================
+// FORMULARIOS
+// ========================================
+
+.form-control {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  font-family: var(--font-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-regular);
+  line-height: 1.5;
+  color: #333333;
+  background-color: #FFFFFF;
+  background-clip: padding-box;
+  border: 1px solid #757575;
+  border-radius: 8px;
+  transition: border-color 150ms ease-out, box-shadow 150ms ease-out;
+  min-height: 40px;
+  
+  &:focus {
+    border-color: #5941F2;
+    outline: 0;
+    box-shadow: 0 0 0 2px rgba(89, 65, 242, 0.25);
+  }
+  
+  &::placeholder {
+    color: #757575;
+    opacity: 1;
+  }
+  
+  &:disabled {
+    background-color: #F2F2F2;
+    opacity: 1;
+  }
+  
+  &.error {
+    border-color: #FF3B30;
+    
+    &:focus {
+      border-color: #FF3B30;
+      box-shadow: 0 0 0 2px rgba(255, 59, 48, 0.25);
+    }
+  }
+}
+
+.form-label {
+  display: inline-block;
+  margin-bottom: 4px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: #333333;
+}
+
+.form-text {
+  margin-top: 4px;
+  font-size: var(--font-size-xs);
+  color: #757575;
+}
+
+.form-error {
+  margin-top: 4px;
+  font-size: var(--font-size-xs);
+  color: #FF3B30;
+}
+
+.required {
+  color: #FF3B30;
+}
+
+// Checkboxes y radios
+input[type="checkbox"],
+input[type="radio"] {
+  margin: 0;
+  margin-right: 8px;
+  accent-color: #5941F2;
+}
+
+// Select
+select.form-control {
+  cursor: pointer;
+  
+  &:focus {
+    border-color: #5941F2;
+    box-shadow: 0 0 0 2px rgba(89, 65, 242, 0.25);
+  }
+}
+
+// Textarea
+textarea.form-control {
+  resize: vertical;
+  min-height: 80px;
+}

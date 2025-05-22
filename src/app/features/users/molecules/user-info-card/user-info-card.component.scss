@@ -1,0 +1,33 @@
+@use 'variables' as *;
+
+.user-info-card {
+  .user-name {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    color: $neutral-dark;
+    margin-bottom: $spacing-xs;
+  }
+  
+  .user-role {
+    margin-bottom: $spacing-sm;
+  }
+  
+  .user-contact {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+    
+    .contact-item {
+      display: flex;
+      align-items: center;
+      color: $neutral-medium;
+      font-size: $font-size-sm;
+      
+      app-icon {
+        color: $tertiary;
+        margin-right: $spacing-xs;
+        font-size: 18px;
+      }
+    }
+  }
+}

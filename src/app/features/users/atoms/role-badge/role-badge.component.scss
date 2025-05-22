@@ -1,0 +1,26 @@
+@use 'variables' as *;
+
+.role-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-xxs $spacing-sm;
+  border-radius: $border-radius-md;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  
+  &.role-admin {
+    background-color: rgba($error, 0.15);
+    color: $error;
+  }
+  
+  &.role-veterinarian {
+    background-color: rgba($tertiary, 0.15);
+    color: $tertiary;
+  }
+  
+  &.role-receptionist {
+    background-color: rgba($warning, 0.15);
+    color: darken($warning, 10%);
+  }
+}

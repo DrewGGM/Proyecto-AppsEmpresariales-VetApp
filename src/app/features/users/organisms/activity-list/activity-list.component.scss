@@ -1,0 +1,119 @@
+@use 'variables' as *;
+
+.activity-list {
+  background-color: $neutral-light;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-md;
+  overflow: hidden;
+  
+  .activity-header {
+    display: flex;
+    align-items: center;
+    padding: $spacing-md;
+    background-color: $neutral-bg;
+    border-bottom: 1px solid rgba($neutral-medium, 0.2);
+    
+    app-icon {
+      color: $tertiary;
+      font-size: 24px;
+      margin-right: $spacing-sm;
+    }
+    
+    h3 {
+      margin: 0;
+      font-size: $font-size-lg;
+      font-weight: $font-weight-medium;
+      color: $neutral-dark;
+    }
+  }
+  
+  .activity-content {
+    padding: $spacing-md;
+    
+    .activity-item {
+      display: flex;
+      margin-bottom: $spacing-md;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+      
+      .activity-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: $border-radius-circle;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: $spacing-md;
+        flex-shrink: 0;
+        
+        app-icon {
+          color: $neutral-light;
+          font-size: 20px;
+        }
+        
+        &.consultation {
+          background-color: $tertiary;
+        }
+        
+        &.vaccination {
+          background-color: $success;
+        }
+        
+        &.login {
+          background-color: $primary;
+        }
+      }
+      
+      .activity-details {
+        .activity-title {
+          font-weight: $font-weight-medium;
+          color: $neutral-dark;
+          margin-bottom: $spacing-xxs;
+        }
+        
+        .activity-info {
+          font-size: $font-size-sm;
+          color: $neutral-medium;
+          margin-bottom: $spacing-xxs;
+        }
+        
+        .activity-time {
+          font-size: $font-size-xs;
+          color: $neutral-medium;
+        }
+      }
+    }
+    
+    .no-activities {
+      text-align: center;
+      color: $neutral-medium;
+      padding: $spacing-lg 0;
+    }
+  }
+  
+  .activity-footer {
+    padding: $spacing-md;
+    display: flex;
+    justify-content: flex-end;
+    border-top: 1px solid rgba($neutral-medium, 0.1);
+    
+    .view-all {
+      display: flex;
+      align-items: center;
+      color: $primary;
+      text-decoration: none;
+      font-size: $font-size-sm;
+      
+      app-icon {
+        margin-left: $spacing-xxs;
+        font-size: 18px;
+      }
+      
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}

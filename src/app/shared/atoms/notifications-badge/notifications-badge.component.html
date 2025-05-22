@@ -1,0 +1,23 @@
+<div 
+  class="notifications-badge" 
+  [ngClass]="getClasses()"
+  (click)="onClick()"
+  [attr.aria-label]="'Notificaciones: ' + count"
+  [attr.tabindex]="disabled ? -1 : 0"
+  [attr.role]="'button'"
+  (keydown.enter)="onClick()"
+  (keydown.space)="onClick()">
+  
+  <!-- Icono principal -->
+  <app-icon [name]="icon" class="notification-icon"></app-icon>
+  
+  <!-- Badge con contador -->
+  <span 
+    *ngIf="shouldShowBadge" 
+    class="badge"
+    [ngClass]="getBadgeClasses()"
+    (click)="onBadgeClick($event)"
+    [attr.aria-label]="'Contador de notificaciones: ' + count">
+    {{ displayCount }}
+  </span>
+</div>

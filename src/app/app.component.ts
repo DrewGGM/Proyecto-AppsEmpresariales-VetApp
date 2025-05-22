@@ -1,11 +1,14 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html',
   standalone: false,
-  styleUrl: './app.component.scss'
+  templateUrl: './app.component.html'
 })
 export class AppComponent {
-  title = 'vetApp';
+  constructor(private router: Router) {
+    // Redirigir directamente a la vista de detalle del usuario 1
+    this.router.navigate(['/users/', 1]);
+  }
 }

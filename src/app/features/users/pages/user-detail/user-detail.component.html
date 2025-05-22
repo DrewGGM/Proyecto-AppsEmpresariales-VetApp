@@ -1,1 +1,244 @@
-<p>user-detail works!</p>
+<app-main-layout>
+  <div class="user-detail-page">
+    <!-- Encabezado de página -->
+    <div class="page-header">
+      <div class="header-content">
+        <div class="title-section">
+          <button class="back-button" (click)="goBack()">
+            <app-icon name="arrow_back"></app-icon>
+          </button>
+          <h1>Detalle de Usuario</h1>
+        </div>
+        <div class="header-actions">
+          <app-search-bar placeholder="Buscar..."></app-search-bar>
+          <app-notifications-badge [count]="3"></app-notifications-badge>
+        </div>
+      </div>
+
+      <div class="breadcrumb">
+        <a routerLink="/">Inicio</a>
+        <app-icon name="chevron_right"></app-icon>
+        <a routerLink="/usuarios">Usuarios</a>
+        <app-icon name="chevron_right"></app-icon>
+        <span *ngIf="user">{{ user.name }} {{ user.lastName }}</span>
+        <span *ngIf="!user && !loading">Usuario no encontrado</span>
+      </div>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="user-content" *ngIf="user && !loading; else loadingTemplate">
+
+      <!-- Tarjeta de perfil principal -->
+      <div class="profile-section">
+        <div class="profile-card">
+          <!-- Estado y acciones -->
+          <div class="profile-header">
+            <div class="status-section">
+              <app-status-indicator [active]="user.active" [showLabel]="true" size="medium">
+              </app-status-indicator>
+            </div>
+
+            <div class="action-buttons" *ngIf="canEditUser || canDeleteUser">
+              <app-button *ngIf="canEditUser" variant="primary" size="sm" (buttonClick)="editUser()">
+                <app-icon name="edit"></app-icon>
+                <span>Editar</span>
+              </app-button>
+
+              <app-button *ngIf="canDeleteUser" variant="danger" size="sm" (buttonClick)="deleteUser()">
+                <app-icon name="delete"></app-icon>
+                <span>Eliminar</span>
+              </app-button>
+            </div>
+          </div>
+
+          <!-- Información principal del usuario -->
+          <div class="profile-main">
+            <div class="avatar-section">
+              <app-user-avatar [name]="user.name" [lastName]="user.lastName" [photoUrl]="user.photoUrl"
+                [active]="user.active" [showEditButton]="canEditUser" size="large">
+              </app-user-avatar>
+            </div>
+
+            <div class="user-info">
+              <h2 class="user-name">{{ user.name }} {{ user.lastName }}</h2>
+
+              <div class="user-role">
+                <app-role-badge [role]="user.role"></app-role-badge>
+              </div>
+
+              <div class="contact-info">
+                <div class="contact-item">
+                  <app-icon name="email"></app-icon>
+                  <span>{{ user.email }}</span>
+                </div>
+
+                <div class="contact-item" *ngIf="user.lastAccess">
+                  <app-icon name="access_time"></app-icon>
+                  <span>Último acceso: {{ user.lastAccess | date:'short' }}</span>
+                </div>
+
+                <div class="contact-item" *ngIf="user.createdAt">
+                  <app-icon name="calendar_today"></app-icon>
+                  <span>Miembro desde: {{ user.createdAt | date:'mediumDate' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Estadísticas - Solo para veterinarios -->
+      <div class="stats-section" *ngIf="isVeterinarian()">
+        <div class="stats-card">
+          <div class="card-header">
+            <app-icon name="analytics"></app-icon>
+            <h3>Actividad y Estadísticas</h3>
+          </div>
+
+          <div class="stats-grid" *ngIf="!loadingStats; else statsLoadingTemplate">
+            <div class="stat-item">
+              <div class="stat-value">{{ userStats.consultations }}</div>
+              <div class="stat-label">Consultas</div>
+              <div class="stat-progress">
+                <div class="progress-bar" [style.width.%]="getStatsPercentage(userStats.consultations)">
+                </div>
+              </div>
+            </div>
+
+            <div class="stat-item">
+              <div class="stat-value">{{ userStats.vaccinations }}</div>
+              <div class="stat-label">Vacunaciones</div>
+              <div class="stat-progress">
+                <div class="progress-bar" [style.width.%]="getStatsPercentage(userStats.vaccinations)">
+                </div>
+              </div>
+            </div>
+
+            <div class="stat-item">
+              <div class="stat-value">{{ userStats.appointments }}</div>
+              <div class="stat-label">Citas</div>
+              <div class="stat-progress">
+                <div class="progress-bar" [style.width.%]="getStatsPercentage(userStats.appointments)">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <ng-template #statsLoadingTemplate>
+            <div class="loading-stats">
+              <app-spinner size="medium"></app-spinner>
+              <span>Cargando estadísticas...</span>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+
+      <!-- Panel de permisos -->
+      <div class="permissions-section">
+        <div class="permissions-card">
+          <div class="card-header">
+            <app-icon name="security"></app-icon>
+            <h3>Permisos y Accesos</h3>
+          </div>
+
+          <div class="permissions-content" *ngIf="!loadingPermissions; else permissionsLoadingTemplate">
+            <div class="permission-item" *ngFor="let permission of permissions">
+              <div class="permission-info">
+                <label class="permission-label">
+                  <input type="checkbox" [checked]="permission.granted" [disabled]="!canManagePermissions"
+                    (change)="onPermissionChange(permission.id, $event)">
+                  <span class="permission-name">{{ permission.name }}</span>
+                </label>
+                <div class="permission-description" *ngIf="permission.description">
+                  {{ permission.description }}
+                </div>
+              </div>
+
+              <div class="permission-status" [ngClass]="permission.granted ? 'granted' : 'restricted'">
+                {{ permission.granted ? 'Concedido' : 'Restringido' }}
+              </div>
+            </div>
+
+            <div class="no-permissions" *ngIf="permissions.length === 0">
+              <app-icon name="info"></app-icon>
+              <span>No hay permisos configurados para este usuario.</span>
+            </div>
+          </div>
+
+          <ng-template #permissionsLoadingTemplate>
+            <div class="loading-permissions">
+              <app-spinner size="medium"></app-spinner>
+              <span>Cargando permisos...</span>
+            </div>
+          </ng-template>
+
+          <div class="permissions-actions" *ngIf="canManagePermissions">
+            <app-button variant="secondary" (buttonClick)="managePermissions()">
+              Gestionar Permisos
+            </app-button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actividad reciente -->
+      <div class="activity-section">
+        <div class="activity-card">
+          <div class="card-header">
+            <app-icon name="history"></app-icon>
+            <h3>Actividad Reciente</h3>
+          </div>
+
+          <div class="activity-content" *ngIf="!loadingActivities; else activityLoadingTemplate">
+            <div class="activity-item" *ngFor="let activity of activities">
+              <div class="activity-icon" [ngClass]="'activity-' + activity.type">
+                <app-icon [name]="getActivityIcon(activity.type)"></app-icon>
+              </div>
+
+              <div class="activity-details">
+                <div class="activity-title">{{ activity.description }}</div>
+                <div class="activity-info" *ngIf="activity.details">{{ activity.details }}</div>
+                <div class="activity-time">{{ activity.date | date:'medium' }}</div>
+              </div>
+            </div>
+
+            <div class="no-activities" *ngIf="activities.length === 0">
+              <app-icon name="info"></app-icon>
+              <span>No hay actividades recientes para mostrar.</span>
+            </div>
+          </div>
+
+          <ng-template #activityLoadingTemplate>
+            <div class="loading-activities">
+              <app-spinner size="medium"></app-spinner>
+              <span>Cargando actividad...</span>
+            </div>
+          </ng-template>
+
+          <div class="activity-footer" *ngIf="activities.length > 0">
+            <button class="view-all-link">
+              Ver toda la actividad
+              <app-icon name="chevron_right"></app-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Template de carga -->
+    <ng-template #loadingTemplate>
+      <div class="loading-container" *ngIf="loading">
+        <app-spinner size="large"></app-spinner>
+        <p>Cargando información del usuario...</p>
+      </div>
+
+      <div class="error-container" *ngIf="!loading && !user">
+        <app-icon name="error" class="error-icon"></app-icon>
+        <h2>Usuario no encontrado</h2>
+        <p>No se pudo encontrar la información del usuario solicitado.</p>
+        <app-button variant="primary" (buttonClick)="goBack()">
+          Volver al listado
+        </app-button>
+      </div>
+    </ng-template>
+  </div>
+</app-main-layout>

@@ -1,0 +1,127 @@
+// ========================================
+// BOTONES
+// ========================================
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  font-family: var(--font-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.5;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  cursor: pointer;
+  user-select: none;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  transition: all 150ms ease-out;
+  gap: 8px;
+  min-height: 40px;
+  
+  &:focus {
+    outline: 2px solid #5941F2;
+    outline-offset: 2px;
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+  
+  // Tamaños
+  &.btn-sm {
+    padding: 4px 12px;
+    font-size: var(--font-size-xs);
+    min-height: 32px;
+  }
+  
+  &.btn-lg {
+    padding: 12px 24px;
+    font-size: var(--font-size-md);
+    min-height: 48px;
+  }
+  
+  // Ancho completo
+  &.w-100 {
+    width: 100%;
+  }
+  
+  // Variantes
+  &.btn-primary {
+    background-color: #5941F2;
+    border-color: #5941F2;
+    color: #FFFFFF;
+    
+    &:hover:not(:disabled) {
+      background-color: #4A34D3;
+      border-color: #4A34D3;
+    }
+    
+    &:active {
+      background-color: #3F2BB8;
+      border-color: #3F2BB8;
+    }
+  }
+  
+  &.btn-secondary {
+    background-color: transparent;
+    border-color: #5941F2;
+    color: #5941F2;
+    
+    &:hover:not(:disabled) {
+      background-color: rgba(89, 65, 242, 0.1);
+    }
+    
+    &:active {
+      background-color: rgba(89, 65, 242, 0.2);
+    }
+  }
+  
+  &.btn-success {
+    background-color: #04D94F;
+    border-color: #04D94F;
+    color: #FFFFFF;
+    
+    &:hover:not(:disabled) {
+      background-color: #03B541;
+      border-color: #03B541;
+    }
+  }
+  
+  &.btn-danger {
+    background-color: #FF3B30;
+    border-color: #FF3B30;
+    color: #FFFFFF;
+    
+    &:hover:not(:disabled) {
+      background-color: #E6352A;
+      border-color: #E6352A;
+    }
+  }
+  
+  &.btn-warning {
+    background-color: #FFB400;
+    border-color: #FFB400;
+    color: #FFFFFF;
+    
+    &:hover:not(:disabled) {
+      background-color: #E6A200;
+      border-color: #E6A200;
+    }
+  }
+  
+  &.btn-tertiary {
+    background-color: transparent;
+    border-color: transparent;
+    color: #5941F2;
+    
+    &:hover:not(:disabled) {
+      background-color: rgba(89, 65, 242, 0.1);
+    }
+  }
+}

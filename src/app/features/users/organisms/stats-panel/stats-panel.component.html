@@ -1,0 +1,20 @@
+<div class="stats-panel">
+  <div class="panel-header">
+    <app-icon [name]="icon"></app-icon>
+    <h3>{{ title }}</h3>
+  </div>
+  
+  <div class="panel-content">
+    <div class="stat-item" *ngFor="let stat of stats">
+      <div class="stat-value">{{ stat.value }}</div>
+      <div class="stat-label">{{ stat.label }}</div>
+      <div class="stat-bar">
+        <div class="stat-progress" [style.width.%]="stat.percentage"></div>
+      </div>
+    </div>
+    
+    <div class="no-stats" *ngIf="stats.length === 0">
+      No hay estadísticas disponibles.
+    </div>
+  </div>
+</div>

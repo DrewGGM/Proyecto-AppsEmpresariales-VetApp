@@ -1,1 +1,15 @@
-/* You can add global styles to this file, and also import other style files */
+// ========================================
+// ESTILOS GLOBALES DE VETAPP
+// ========================================
+
+@use './assets/styles/main.scss';
+
+// Estilos adicionales específicos de la aplicación
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+// Estilos para Angular Material (si se usa)
+//@import '~@angular/material/prebuilt-themes/indigo-pink.css';

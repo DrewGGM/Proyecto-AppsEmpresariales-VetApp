@@ -1,1 +1,24 @@
-<p>user-info-card works!</p>
+<div class="user-info-card" *ngIf="user">
+  <div class="user-name">{{ user.name }} {{ user.lastName }}</div>
+  
+  <div class="user-role">
+    <app-role-badge [role]="user.role"></app-role-badge>
+  </div>
+  
+  <div class="user-contact">
+    <div class="contact-item">
+      <app-icon name="email"></app-icon>
+      <span>{{ user.email }}</span>
+    </div>
+    
+    <div class="contact-item" *ngIf="user.lastAccess">
+      <app-icon name="access_time"></app-icon>
+      <span>Último acceso: {{ user.lastAccess | date:'medium' }}</span>
+    </div>
+    
+    <div class="contact-item" *ngIf="user.createdAt">
+      <app-icon name="calendar_today"></app-icon>
+      <span>Miembro desde: {{ user.createdAt | date:'mediumDate' }}</span>
+    </div>
+  </div>
+</div>

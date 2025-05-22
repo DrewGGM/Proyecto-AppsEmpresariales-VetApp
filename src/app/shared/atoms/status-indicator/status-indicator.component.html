@@ -1,0 +1,4 @@
+<div class="status-indicator" [ngClass]="getClasses()">
+  <span class="status-dot" [attr.aria-hidden]="true"></span>
+  <span class="status-label" *ngIf="showLabel">{{ displayLabel }}</span>
+</div>

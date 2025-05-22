@@ -1,1 +1,6 @@
-<p>status-indicator works!</p>
+<div class="status-indicator" [ngClass]="[active ? 'active' : 'inactive', size]">
+  <span class="status-dot"></span>
+  <span class="status-label" *ngIf="showLabel">
+    {{ active ? 'Activo' : 'Inactivo' }}
+  </span>
+</div>

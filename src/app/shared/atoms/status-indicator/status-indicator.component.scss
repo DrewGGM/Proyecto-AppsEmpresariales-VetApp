@@ -1,0 +1,145 @@
+@use 'variables' as *;
+
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  font-weight: $font-weight-medium;
+  
+  .status-dot {
+    display: inline-block;
+    border-radius: $border-radius-circle;
+    position: relative;
+    
+    // Efecto de pulso para estados activos
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: $border-radius-circle;
+      opacity: 0;
+      transition: opacity $transition-default;
+    }
+  }
+  
+  .status-label {
+    white-space: nowrap;
+    user-select: none;
+  }
+  
+  // Tamaños
+  &.small {
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      
+      &::after {
+        width: 16px;
+        height: 16px;
+      }
+    }
+    
+    .status-label {
+      font-size: $font-size-xs;
+    }
+  }
+  
+  &.medium {
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      
+      &::after {
+        width: 20px;
+        height: 20px;
+      }
+    }
+    
+    .status-label {
+      font-size: $font-size-sm;
+    }
+  }
+  
+  &.large {
+    .status-dot {
+      width: 12px;
+      height: 12px;
+      
+      &::after {
+        width: 24px;
+        height: 24px;
+      }
+    }
+    
+    .status-label {
+      font-size: $font-size-md;
+    }
+  }
+  
+  // Posiciones
+  &.position-left {
+    .status-dot {
+      margin-right: $spacing-xs;
+    }
+  }
+  
+  &.position-right {
+    flex-direction: row-reverse;
+    
+    .status-dot {
+      margin-left: $spacing-xs;
+    }
+  }
+  
+  // Estados
+  &.active {
+    .status-dot {
+      background-color: $success;
+      box-shadow: 0 0 0 2px rgba($success, 0.2);
+      
+      &::after {
+        background-color: rgba($success, 0.4);
+        animation: pulse 2s infinite;
+      }
+    }
+    
+    .status-label {
+      color: $success;
+    }
+    
+    &:hover .status-dot::after {
+      opacity: 1;
+    }
+  }
+  
+  &.inactive {
+    .status-dot {
+      background-color: $error;
+      box-shadow: 0 0 0 2px rgba($error, 0.2);
+      
+      &::after {
+        background-color: rgba($error, 0.4);
+      }
+    }
+    
+    .status-label {
+      color: $error;
+    }
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}

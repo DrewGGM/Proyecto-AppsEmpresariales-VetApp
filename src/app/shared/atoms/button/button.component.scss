@@ -1,0 +1,105 @@
+@use 'variables' as *;
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-xs $spacing-md;
+  font-family: $font-primary;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  line-height: $line-height-normal;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  cursor: pointer;
+  user-select: none;
+  border: 1px solid transparent;
+  border-radius: $border-radius-md;
+  transition: $transition-default;
+  gap: $spacing-xs;
+  min-height: $button-height;
+  
+  &:focus {
+    outline: 2px solid $primary;
+    outline-offset: 2px;
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+  
+  // Tamaños
+  &.btn-sm {
+    padding: $spacing-xxs $spacing-sm;
+    font-size: $font-size-xs;
+    min-height: 32px;
+  }
+  
+  &.btn-lg {
+    padding: $spacing-sm $spacing-lg;
+    font-size: $font-size-md;
+    min-height: 48px;
+  }
+  
+  // Ancho completo
+  &.w-100 {
+    width: 100%;
+  }
+  
+  // Variantes
+  &.btn-primary {
+    background-color: $primary;
+    border-color: $primary;
+    color: $neutral-light;
+    
+    &:hover:not(:disabled) {
+      background-color: $primary-dark;
+      border-color: $primary-dark;
+    }
+  }
+  
+  &.btn-secondary {
+    background-color: transparent;
+    border-color: $primary;
+    color: $primary;
+    
+    &:hover:not(:disabled) {
+      background-color: rgba($primary, 0.1);
+    }
+  }
+  
+  &.btn-success {
+    background-color: $success;
+    border-color: $success;
+    color: $neutral-light;
+    
+    &:hover:not(:disabled) {
+      background-color: $secondary-dark;
+      border-color: $secondary-dark;
+    }
+  }
+  
+  &.btn-danger {
+    background-color: $error;
+    border-color: $error;
+    color: $neutral-light;
+    
+    &:hover:not(:disabled) {
+      background-color: darken($error, 10%);
+      border-color: darken($error, 10%);
+    }
+  }
+  
+  &.btn-tertiary {
+    background-color: transparent;
+    border-color: transparent;
+    color: $primary;
+    
+    &:hover:not(:disabled) {
+      background-color: rgba($primary, 0.1);
+    }
+  }
+}

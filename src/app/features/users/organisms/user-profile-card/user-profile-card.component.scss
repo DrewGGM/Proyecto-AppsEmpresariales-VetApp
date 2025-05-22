@@ -1,0 +1,47 @@
+@use 'variables' as *;
+
+.profile-card {
+  background-color: $neutral-light;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-md;
+  padding: $spacing-lg;
+  position: relative;
+  margin-bottom: $spacing-lg;
+  
+  .profile-status {
+    position: absolute;
+    top: $spacing-lg;
+    left: $spacing-lg;
+  }
+  
+  .profile-actions {
+    position: absolute;
+    top: $spacing-lg;
+    right: $spacing-lg;
+    display: flex;
+    gap: $spacing-sm;
+  }
+  
+  .profile-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding-top: $spacing-xl;
+    
+    @media (min-width: $breakpoint-md) {
+      flex-direction: row;
+      text-align: left;
+      padding-top: $spacing-lg;
+    }
+    
+    .profile-avatar {
+      margin-bottom: $spacing-lg;
+      
+      @media (min-width: $breakpoint-md) {
+        margin-right: $spacing-xl;
+        margin-bottom: 0;
+      }
+    }
+  }
+}

@@ -1,1 +1,39 @@
-<p>button works!</p>
+<button 
+  [type]="buttonType"
+  [class]="buttonClasses"
+  [disabled]="disabled || loading"
+  (click)="onClick($event)">
+  
+  <!-- Spinner cuando está cargando -->
+  <span class="btn-spinner" *ngIf="loading">
+    <app-icon name="refresh" [spin]="true"></app-icon>
+  </span>
+  
+  <!-- Icono a la izquierda -->
+  <app-icon 
+    *ngIf="icon && iconPosition === 'left' && !loading" 
+    [name]="icon" 
+    size="small" 
+    class="btn-icon btn-icon-left">
+  </app-icon>
+  
+  <!-- Contenido del botón -->
+  <span class="btn-content" *ngIf="!iconOnly">
+    <ng-content></ng-content>
+  </span>
+  
+  <!-- Icono si es botón de sólo icono -->
+  <app-icon 
+    *ngIf="iconOnly && icon && !loading" 
+    [name]="icon" 
+    size="small">
+  </app-icon>
+  
+  <!-- Icono a la derecha -->
+  <app-icon 
+    *ngIf="icon && iconPosition === 'right' && !loading" 
+    [name]="icon" 
+    size="small" 
+    class="btn-icon btn-icon-right">
+  </app-icon>
+</button>

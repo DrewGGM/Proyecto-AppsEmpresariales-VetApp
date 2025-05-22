@@ -1,1 +1,43 @@
-<p>permissions-panel works!</p>
+<div class="permissions-panel">
+  <div class="panel-header">
+    <app-icon name="security"></app-icon>
+    <h3>Permisos y Accesos</h3>
+  </div>
+  
+  <div class="panel-content">
+    <div class="permission-item" *ngFor="let permission of permissions">
+      <div class="permission-check">
+        <input 
+          type="checkbox" 
+          [id]="'permission-' + permission.id"
+          [checked]="permission.granted" 
+          [disabled]="!canEdit"
+          (change)="onPermissionChange(permission, $event)">   
+      </div>
+      
+      <div class="permission-label">
+        <label [for]="'permission-' + permission.id">{{ permission.name }}</label>
+        <div class="permission-description" *ngIf="permission.description">
+          {{ permission.description }}
+        </div>
+      </div>
+      
+      <div class="permission-status" 
+           [ngClass]="{'granted': permission.granted, 'restricted': !permission.granted}">
+        {{ permission.granted ? 'Concedido' : 'Restringido' }}
+      </div>
+    </div>
+    
+    <div class="no-permissions" *ngIf="permissions.length === 0">
+      No hay permisos configurados para este usuario.
+    </div>
+  </div>
+  
+  <div class="panel-actions" *ngIf="canEdit">
+    <app-button 
+      variant="primary"
+      (buttonClick)="onManagePermissions()">
+      Gestionar Permisos
+    </app-button>
+  </div>
+</div>

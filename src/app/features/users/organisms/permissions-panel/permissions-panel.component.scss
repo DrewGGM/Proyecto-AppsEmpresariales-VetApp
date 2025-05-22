@@ -1,0 +1,105 @@
+@use 'variables' as *;
+
+.permissions-panel {
+  background-color: $neutral-light;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-md;
+  overflow: hidden;
+  
+  .panel-header {
+    display: flex;
+    align-items: center;
+    padding: $spacing-md;
+    background-color: $neutral-bg;
+    border-bottom: 1px solid rgba($neutral-medium, 0.2);
+    
+    app-icon {
+      color: $tertiary;
+      font-size: 24px;
+      margin-right: $spacing-sm;
+    }
+    
+    h3 {
+      margin: 0;
+      font-size: $font-size-lg;
+      font-weight: $font-weight-medium;
+      color: $neutral-dark;
+    }
+  }
+  
+  .panel-content {
+    padding: $spacing-md;
+    
+    .permission-item {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: $spacing-md;
+      align-items: center;
+      padding: $spacing-sm 0;
+      border-bottom: 1px solid rgba($neutral-medium, 0.1);
+      
+      &:last-child {
+        border-bottom: none;
+      }
+      
+      .permission-check {
+        input[type="checkbox"] {
+          width: 18px;
+          height: 18px;
+          accent-color: $primary;
+          cursor: pointer;
+          
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+        }
+      }
+      
+      .permission-label {
+        label {
+          display: block;
+          font-weight: $font-weight-medium;
+          color: $neutral-dark;
+          margin-bottom: $spacing-xxs;
+          cursor: pointer;
+        }
+        
+        .permission-description {
+          font-size: $font-size-xs;
+          color: $neutral-medium;
+        }
+      }
+      
+      .permission-status {
+        font-size: $font-size-xs;
+        font-weight: $font-weight-medium;
+        padding: $spacing-xxs $spacing-xs;
+        border-radius: $border-radius-sm;
+        
+        &.granted {
+          background-color: rgba($success, 0.1);
+          color: $success;
+        }
+        
+        &.restricted {
+          background-color: rgba($warning, 0.1);
+          color: darken($warning, 15%);
+        }
+      }
+    }
+    
+    .no-permissions {
+      text-align: center;
+      color: $neutral-medium;
+      padding: $spacing-lg 0;
+    }
+  }
+  
+  .panel-actions {
+    padding: $spacing-md;
+    display: flex;
+    justify-content: center;
+    border-top: 1px solid rgba($neutral-medium, 0.2);
+  }
+}

@@ -16,7 +16,6 @@ import { NotificationsBadgeComponent } from './atoms/notifications-badge/notific
 // Moléculas
 import { FormFieldComponent } from './molecules/form-field/form-field.component';
 import { SearchBarComponent } from './molecules/search-bar/search-bar.component';
-import { StatusIndicatorComponent as MoleculeStatusIndicatorComponent } from './molecules/status-indicator/status-indicator.component';
 import { CardComponent } from './molecules/card/card.component';
 import { AlertComponent } from './molecules/alert/alert.component';
 import { UserCardComponent } from './molecules/user-card/user-card.component';
@@ -58,7 +57,6 @@ import { SortPipe } from './pipes/sort.pipe';
     // Moléculas
     FormFieldComponent,
     SearchBarComponent,
-    MoleculeStatusIndicatorComponent,
     CardComponent,
     AlertComponent,
     UserCardComponent,
@@ -111,7 +109,6 @@ import { SortPipe } from './pipes/sort.pipe';
     // Moléculas
     FormFieldComponent,
     SearchBarComponent,
-    MoleculeStatusIndicatorComponent,
     CardComponent,
     AlertComponent,
     UserCardComponent,

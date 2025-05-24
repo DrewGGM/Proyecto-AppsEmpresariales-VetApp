@@ -1,16 +1,22 @@
+// features/auth/auth-routing.module.ts
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './pages/login/login.component';
-import { AuthLayoutComponent } from './components/auth-layout/auth-layout.component';
+import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
 
 const routes: Routes = [
   {
     path: '',
-    component: AuthLayoutComponent,
     children: [
       {
         path: 'login',
-        component: LoginComponent
+        component: LoginComponent,
+        data: { title: 'Iniciar Sesión' }
+      },
+      {
+        path: 'forgot-password',
+        component: ForgotPasswordComponent,
+        data: { title: 'Recuperar Contraseña' }
       },
       {
         path: '',

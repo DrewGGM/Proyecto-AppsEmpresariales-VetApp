@@ -7,5 +7,5 @@ import { Component } from '@angular/core';
   styleUrl: './forgot-password.component.scss'
 })
 export class ForgotPasswordComponent {
-
+  // TODO: Implement forgot password functionality
 }

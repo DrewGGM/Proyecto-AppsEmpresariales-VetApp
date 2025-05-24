@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 
@@ -10,7 +10,6 @@ import { SharedModule } from '../../shared/shared.module';
 import { UserDetailComponent } from './pages/user-detail/user-detail.component';
 import { UserListComponent } from './pages/user-list/user-list.component';
 import { UserCreateEditComponent } from './pages/user-create-edit/user-create-edit.component';
-import { LoginComponent } from './pages/login/login.component';
 
 // Átomos
 import { UserAvatarComponent } from './atoms/user-avatar/user-avatar.component';
@@ -35,7 +34,6 @@ import { UserFormComponent } from './organisms/user-form/user-form.component';
     UserDetailComponent,
     UserListComponent,
     UserCreateEditComponent,
-    LoginComponent,
     
     // Átomos
     UserAvatarComponent,
@@ -60,6 +58,9 @@ import { UserFormComponent } from './organisms/user-form/user-form.component';
     ReactiveFormsModule,
     UsersRoutingModule,
     SharedModule
+  ],
+  providers: [
+    DatePipe
   ]
 })
 export class UsersModule { }

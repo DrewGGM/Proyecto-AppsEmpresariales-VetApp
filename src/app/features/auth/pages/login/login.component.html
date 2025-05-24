@@ -1,1 +1,6 @@
-<p>login works!</p>
+<app-auth-layout>
+  <app-login-form
+    (submitForm)="onLoginSubmit($event)"
+    (forgotPassword)="onForgotPassword()">
+  </app-login-form>
+</app-auth-layout>

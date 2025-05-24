@@ -1,1 +1,40 @@
-<p>input works!</p>
+<div [class]="wrapperClasses">
+  <!-- Icon izquierdo -->
+  <app-icon 
+    *ngIf="icon && iconPosition === 'left'" 
+    [name]="icon" 
+    class="input-icon input-icon-left">
+  </app-icon>
+
+  <!-- Campo de entrada -->
+  <input
+    [type]="inputType"
+    [class]="inputClasses"
+    [placeholder]="placeholder"
+    [disabled]="disabled"
+    [readonly]="readonly"
+    [required]="required"
+    [value]="value"
+    [attr.autocomplete]="type === 'email' ? 'email' : (type === 'password' ? 'current-password' : null)"
+    (input)="onInput($event)"
+    (blur)="onBlur($event)"
+    (focus)="onFocus($event)">
+
+  <!-- Icon derecho -->
+  <app-icon 
+    *ngIf="icon && iconPosition === 'right'" 
+    [name]="icon" 
+    class="input-icon input-icon-right">
+  </app-icon>
+
+  <!-- Toggle de password -->
+  <button
+    *ngIf="showPasswordToggle && type === 'password'"
+    type="button"
+    class="password-toggle"
+    (click)="togglePasswordVisibility()"
+    [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+    tabindex="-1">
+    <app-icon [name]="showPassword ? 'visibility_off' : 'visibility'"></app-icon>
+  </button>
+</div>

@@ -1,0 +1,170 @@
+// shared/templates/auth-layout/auth-layout.component.scss
+@use 'variables' as *;
+
+.auth-layout {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  
+  // Gradiente de fondo inspirado en el diseño
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  
+  // Versión alternativa más colorida basada en los círculos del diseño
+  // background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.auth-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  
+  .bg-circle {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.15;
+    filter: blur(1px);
+    
+    // Círculo grande púrpura (superior derecha)
+    &.bg-circle-1 {
+      width: 400px;
+      height: 400px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      top: -200px;
+      right: -200px;
+      animation: float 20s ease-in-out infinite;
+    }
+    
+    // Círculo mediano verde (inferior izquierda)
+    &.bg-circle-2 {
+      width: 300px;
+      height: 300px;
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      bottom: -150px;
+      left: -150px;
+      animation: float 25s ease-in-out infinite reverse;
+    }
+    
+    // Círculo pequeño púrpura (centro derecha)
+    &.bg-circle-3 {
+      width: 200px;
+      height: 200px;
+      background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+      top: 20%;
+      right: 10%;
+      animation: float 30s ease-in-out infinite;
+    }
+    
+    // Círculo extra para más decoración
+    &.bg-circle-4 {
+      width: 150px;
+      height: 150px;
+      background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+      bottom: 30%;
+      right: 60%;
+      animation: float 35s ease-in-out infinite reverse;
+    }
+  }
+}
+
+.auth-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 480px;
+  padding: $spacing-lg;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+// Animaciones flotantes para los círculos
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-20px) rotate(5deg);
+  }
+  50% {
+    transform: translateY(0px) rotate(10deg);
+  }
+  75% {
+    transform: translateY(-10px) rotate(5deg);
+  }
+}
+
+// Responsive
+@media (max-width: $breakpoint-md) {
+  .auth-layout {
+    padding: $spacing-md;
+  }
+  
+  .auth-background {
+    .bg-circle {
+      &.bg-circle-1 {
+        width: 300px;
+        height: 300px;
+        top: -150px;
+        right: -150px;
+      }
+      
+      &.bg-circle-2 {
+        width: 250px;
+        height: 250px;
+        bottom: -125px;
+        left: -125px;
+      }
+      
+      &.bg-circle-3 {
+        width: 150px;
+        height: 150px;
+      }
+      
+      &.bg-circle-4 {
+        width: 100px;
+        height: 100px;
+      }
+    }
+  }
+  
+  .auth-content {
+    padding: $spacing-md;
+  }
+}
+
+@media (max-width: $breakpoint-sm) {
+  .auth-background {
+    .bg-circle {
+      &.bg-circle-1 {
+        width: 200px;
+        height: 200px;
+        top: -100px;
+        right: -100px;
+      }
+      
+      &.bg-circle-2 {
+        width: 180px;
+        height: 180px;
+        bottom: -90px;
+        left: -90px;
+      }
+    }
+  }
+}
+
+// Modo oscuro (opcional)
+@media (prefers-color-scheme: dark) {
+  .auth-layout {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  }
+  
+  .auth-background .bg-circle {
+    opacity: 0.1;
+  }
+}

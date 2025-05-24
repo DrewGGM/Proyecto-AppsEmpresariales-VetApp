@@ -1,0 +1,182 @@
+@use 'variables' as *;
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: $neutral-light;
+  border: 2px solid rgba($neutral-medium, 0.3);
+  border-radius: $border-radius-md;
+  transition: $transition-default;
+  
+  &:focus-within {
+    border-color: $primary;
+    box-shadow: 0 0 0 3px rgba($primary, 0.1);
+  }
+  
+  // Estados
+  &.input-error {
+    border-color: $error;
+    background-color: rgba($error, 0.05);
+    
+    &:focus-within {
+      border-color: $error;
+      box-shadow: 0 0 0 3px rgba($error, 0.1);
+    }
+  }
+  
+  &.input-success {
+    border-color: $success;
+    
+    &:focus-within {
+      border-color: $success;
+      box-shadow: 0 0 0 3px rgba($success, 0.1);
+    }
+  }
+  
+  &.input-disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: $neutral-bg;
+  }
+  
+  &.input-readonly {
+    background-color: $neutral-bg;
+  }
+  
+  // Tamaños
+  &.input-sm {
+    height: 36px;
+    
+    .input-field {
+      font-size: $font-size-sm;
+      padding: 0 $spacing-sm;
+    }
+    
+    .input-icon {
+      font-size: 16px;
+    }
+    
+    &.input-icon-left .input-field {
+      padding-left: 32px;
+    }
+    
+    &.input-icon-right .input-field {
+      padding-right: 32px;
+    }
+  }
+  
+  &.input-md {
+    height: $input-height;
+    
+    .input-field {
+      font-size: $font-size-md;
+      padding: 0 $spacing-md;
+    }
+    
+    .input-icon {
+      font-size: 20px;
+    }
+    
+    &.input-icon-left .input-field {
+      padding-left: 40px;
+    }
+    
+    &.input-icon-right .input-field {
+      padding-right: 40px;
+    }
+  }
+  
+  &.input-lg {
+    height: 52px;
+    
+    .input-field {
+      font-size: $font-size-lg;
+      padding: 0 $spacing-lg;
+    }
+    
+    .input-icon {
+      font-size: 24px;
+    }
+    
+    &.input-icon-left .input-field {
+      padding-left: 48px;
+    }
+    
+    &.input-icon-right .input-field {
+      padding-right: 48px;
+    }
+  }
+}
+
+.input-field {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: $font-primary;
+  color: $neutral-dark;
+  width: 100%;
+  
+  &::placeholder {
+    color: $neutral-medium;
+  }
+  
+  &:disabled {
+    cursor: not-allowed;
+  }
+  
+  &.input-with-toggle {
+    padding-right: 50px !important;
+  }
+}
+
+.input-icon {
+  position: absolute;
+  color: $neutral-medium;
+  pointer-events: none;
+  transition: color $transition-default;
+  
+  &.input-icon-left {
+    left: $spacing-sm;
+  }
+  
+  &.input-icon-right {
+    right: $spacing-sm;
+  }
+}
+
+.password-toggle {
+  position: absolute;
+  right: $spacing-sm;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: $neutral-medium;
+  padding: $spacing-xs;
+  border-radius: $border-radius-sm;
+  transition: $transition-default;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  &:hover {
+    color: $primary;
+    background-color: rgba($primary, 0.1);
+  }
+  
+  &:focus {
+    outline: 2px solid $primary;
+    outline-offset: 2px;
+  }
+  
+  app-icon {
+    font-size: 18px;
+  }
+}
+
+// Focus dentro del wrapper cuando se enfoca el toggle
+.input-wrapper:has(.password-toggle:focus) {
+  border-color: $primary;
+  box-shadow: 0 0 0 3px rgba($primary, 0.1);
+}

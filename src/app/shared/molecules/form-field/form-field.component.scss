@@ -1,0 +1,109 @@
+@use 'variables' as *;
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+  margin-bottom: $spacing-md;
+  
+  .form-label {
+    display: flex;
+    align-items: center;
+    color: $neutral-dark;
+    font-weight: $font-weight-medium;
+    font-size: $font-size-sm;
+    cursor: pointer;
+    
+    .label-icon {
+      margin-right: $spacing-xs;
+      color: $primary;
+      font-size: 18px;
+    }
+    
+    .label-text {
+      flex: 1;
+    }
+    
+    .label-required {
+      color: $error;
+      margin-left: $spacing-xxs;
+      font-weight: $font-weight-bold;
+    }
+  }
+  
+  .input-container {
+    position: relative;
+  }
+  
+  .form-feedback {
+    min-height: 20px;
+    
+    .error-message {
+      display: flex;
+      align-items: center;
+      color: $error;
+      font-size: $font-size-xs;
+      
+      .error-icon {
+        margin-right: $spacing-xxs;
+        font-size: 14px;
+      }
+    }
+    
+    .hint-message {
+      color: $neutral-medium;
+      font-size: $font-size-xs;
+    }
+  }
+  
+  // Estado de error
+  &.form-field-error {
+    .form-label {
+      color: $error;
+      
+      .label-icon {
+        color: $error;
+      }
+    }
+  }
+}
+
+// Variaciones de diseño
+.form-field-horizontal {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: $spacing-md;
+  
+  .form-label {
+    min-width: 120px;
+    margin-top: 8px; // Alinear con el input
+  }
+  
+  .input-container {
+    flex: 1;
+  }
+  
+  .form-feedback {
+    margin-left: 120px + $spacing-md;
+  }
+}
+
+.form-field-inline {
+  flex-direction: row;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-sm;
+  
+  .form-label {
+    margin-bottom: 0;
+    white-space: nowrap;
+  }
+  
+  .input-container {
+    flex: 1;
+  }
+  
+  .form-feedback {
+    margin-left: $spacing-sm;
+  }
+}

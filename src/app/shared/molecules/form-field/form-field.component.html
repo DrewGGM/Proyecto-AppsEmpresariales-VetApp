@@ -1,1 +1,47 @@
-<p>form-field works!</p>
+<div class="form-field" [class.form-field-error]="hasError">
+  <!-- Label -->
+  <label 
+    *ngIf="label" 
+    [for]="fieldId" 
+    class="form-label">
+    <app-icon 
+      *ngIf="icon && iconPosition === 'left'" 
+      [name]="icon" 
+      class="label-icon">
+    </app-icon>
+    <span class="label-text">{{ label }}</span>
+    <span *ngIf="required" class="label-required" aria-label="obligatorio">*</span>
+  </label>
+
+  <!-- Input wrapper -->
+  <div class="input-container">
+    <app-input
+      [id]="fieldId"
+      [type]="type"
+      [placeholder]="placeholder"
+      [disabled]="disabled"
+      [readonly]="readonly"
+      [required]="required"
+      [size]="size"
+      [state]="inputState"
+      [icon]="iconPosition === 'left' ? '' : icon"
+      [iconPosition]="iconPosition"
+      [showPasswordToggle]="showPasswordToggle"
+      [value]="value"
+      (input)="onInput($event)"
+      (blur)="onBlur($event)"
+      (focus)="onFocus($event)">
+    </app-input>
+  </div>
+
+  <!-- Helper text / Error message -->
+  <div class="form-feedback" *ngIf="hint || hasError">
+    <div *ngIf="hasError" class="error-message">
+      <app-icon name="error" class="error-icon"></app-icon>
+      <span>{{ displayErrorMessage }}</span>
+    </div>
+    <div *ngIf="hint && !hasError" class="hint-message">
+      <span>{{ hint }}</span>
+    </div>
+  </div>
+</div>

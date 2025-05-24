@@ -1,1 +1,78 @@
-<p>login-form works!</p>
+<!-- features/auth/components/login-form/login-form.component.html -->
+<div class="login-form-container">
+  <!-- Header del Login -->
+  <div class="login-header">
+    <div class="logo">
+      <app-icon name="pets" class="logo-icon"></app-icon>
+      <h1>VetApp</h1>
+    </div>
+    <h2>Iniciar Sesión</h2>
+  </div>
+
+  <!-- Formulario de Login -->
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate class="login-form">
+    
+    <!-- Campo Email -->
+    <app-form-field
+      label="Correo Electrónico"
+      type="email"
+      placeholder="usuario@ejemplo.com"
+      icon="email"
+      iconPosition="left"
+      [required]="true"
+      [control]="email"
+      formControlName="email">
+    </app-form-field>
+
+    <!-- Campo Contraseña -->
+    <app-form-field
+      label="Contraseña"
+      type="password"
+      placeholder="Tu contraseña"
+      icon="lock"
+      iconPosition="left"
+      [required]="true"
+      [showPasswordToggle]="true"
+      [control]="password"
+      formControlName="password">
+    </app-form-field>
+
+    <!-- Opciones adicionales -->
+    <div class="form-options">
+      <div class="remember-me">
+        <input 
+          type="checkbox" 
+          id="remember" 
+          formControlName="remember"
+          class="checkbox-input">
+        <label for="remember" class="checkbox-label">Recordarme</label>
+      </div>
+      
+      <button
+        type="button"
+        class="forgot-password-link"
+        (click)="onForgotPassword()">
+        ¿Olvidaste tu contraseña?
+      </button>
+    </div>
+
+    <!-- Botón de Submit -->
+    <app-button
+      type="submit"
+      variant="primary"
+      size="lg"
+      [fullWidth]="true"
+      [loading]="isLoading"
+      [disabled]="loginForm.invalid || isLoading"
+      icon="arrow_forward"
+      iconPosition="right">
+      <span *ngIf="!isLoading">Iniciar Sesión</span>
+      <span *ngIf="isLoading">Iniciando sesión...</span>
+    </app-button>
+  </form>
+
+  <!-- Footer -->
+  <div class="login-footer">
+    <p>© 2025 VetApp - Gestión Veterinaria</p>
+  </div>
+</div>

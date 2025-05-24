@@ -1,19 +1,31 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { AuthGuard } from './core/auth/guards/auth.guard';
 
 const routes: Routes = [
+  // Rutas de autenticación (solo para usuarios no logueados)
   {
-    path: '',
-    redirectTo: '/usuarios/1', // Redirigir directamente al usuario 1 para pruebas
-    pathMatch: 'full'
+    path: 'auth',
+    loadChildren: () => import('./features/auth/auth.module').then(m => m.AuthModule),
   },
+  
+  // Rutas protegidas (solo para usuarios logueados)
   {
     path: 'usuarios',
-    loadChildren: () => import('./features/users/users.module').then(m => m.UsersModule)
+    loadChildren: () => import('./features/users/users.module').then(m => m.UsersModule),
   },
+  
+  // Ruta por defecto
+  {
+    path: '',
+    redirectTo: '/usuarios',
+    pathMatch: 'full'
+  },
+  
+  // Ruta wildcard
   {
     path: '**',
-    redirectTo: '/usuarios/1'
+    redirectTo: '/auth/login'
   }
 ];
 

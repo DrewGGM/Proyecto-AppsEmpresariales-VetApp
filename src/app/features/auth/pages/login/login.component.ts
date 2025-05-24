@@ -40,7 +40,7 @@ export class LoginComponent implements OnInit, OnDestroy {
    * Obtiene la URL de retorno desde los query params
    */
   private getReturnUrl(): void {
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/usuarios';
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
   }
 
   /**

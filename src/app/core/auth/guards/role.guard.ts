@@ -50,7 +50,7 @@ export class RoleGuard implements CanActivate {
           return true;
         } else {
           // Redirigir al dashboard si no tiene permisos
-          this.router.navigate(['/']);
+          this.router.navigate(['/dashboard']);
           return false;
         }
       })

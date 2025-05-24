@@ -71,12 +71,19 @@ export class AuthService {
    */
   login(credentials: LoginCredentials): Observable<UserSession> {
     this.updateAuthState({ loading: true, error: null });
+
+    // Solo enviar email y password al backend (sin remember)
+    const loginPayload = {
+      email: credentials.email,
+      password: credentials.password
+    };
     
-    return this.http.post<UserSession>(`${this.API_URL}/login`, credentials)
+    return this.http.post<UserSession>(`${this.API_URL}/login`, loginPayload)
       .pipe(
         tap(response => {
           if (response.success) {
-            this.setUserSession(response, credentials.remember);
+            // Usar el remember del frontend para decidir dónde guardar
+            this.setUserSession(response, credentials.remember || false);
             this.updateAuthState({
               isAuthenticated: true,
               user: response,

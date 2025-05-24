@@ -1,1 +1,334 @@
-<p>user-list works!</p>
+<app-dashboard-layout>
+  <div class="user-list-page">
+    <!-- Encabezado de página -->
+    <div class="page-header">
+      <div class="header-content">
+        <div class="title-section">
+          <h1>Gestión de Usuarios</h1>
+          <p>Administra todos los usuarios del sistema</p>
+        </div>
+        <div class="header-actions">
+          <app-button variant="secondary" (buttonClick)="refreshData()" [disabled]="loading">
+            <app-icon name="refresh"></app-icon>
+            <span>Actualizar</span>
+          </app-button>
+          <app-button variant="primary" (buttonClick)="createUser()">
+            <app-icon name="add"></app-icon>
+            <span>Nuevo Usuario</span>
+          </app-button>
+        </div>
+      </div>
+
+      <div class="breadcrumb">
+        <a routerLink="/dashboard">Inicio</a>
+        <app-icon name="chevron_right"></app-icon>
+        <span>Usuarios</span>
+      </div>
+    </div>
+
+    <!-- Filtros de búsqueda -->
+    <div class="filters-section">
+      <!-- Selector de tipo de búsqueda -->
+      <div class="search-type-selector">
+        <label for="searchType">Tipo de Búsqueda:</label>
+        <select 
+          id="searchType"
+          [(ngModel)]="searchType"
+          (ngModelChange)="onSearchTypeChange()"
+          class="search-type-select">
+          <option *ngFor="let type of searchTypes" [value]="type.value">
+            {{ type.label }}
+          </option>
+        </select>
+        <small class="search-description">
+          {{ currentSearchTypeDescription }}
+        </small>
+      </div>
+
+      <!-- Campos de búsqueda dinámicos -->
+      <div class="search-fields">
+        
+        <!-- Búsqueda General -->
+        <div *ngIf="searchType === 'general'" class="general-search">
+          <div class="filters-row">
+            <!-- Búsqueda por nombre/email -->
+            <div class="filter-item">
+              <label for="search">Buscar:</label>
+              <input 
+                id="search"
+                type="text" 
+                [(ngModel)]="searchTerm" 
+                (ngModelChange)="onSearch($event)"
+                (keyup.enter)="executeSearch()"
+                placeholder="Buscar por nombre o email..."
+                class="search-input">
+            </div>
+
+            <!-- Filtro por rol -->
+            <div class="filter-item">
+              <label for="role">Rol:</label>
+              <select 
+                id="role"
+                [(ngModel)]="selectedRole" 
+                (ngModelChange)="onRoleFilter($event)"
+                class="filter-select">
+                <option value="">Todos los roles</option>
+                <option value="ADMIN">Administrador</option>
+                <option value="VETERINARIAN">Veterinario</option>
+                <option value="RECEPTIONIST">Recepcionista</option>
+              </select>
+            </div>
+
+            <!-- Filtro por estado -->
+            <div class="filter-item">
+              <label for="status">Estado:</label>
+              <select 
+                id="status"
+                [value]="selectedStatus === undefined ? '' : selectedStatus.toString()" 
+                (change)="onStatusFilter($any($event.target).value)"
+                class="filter-select">
+                <option value="">Todos</option>
+                <option value="true">Activos</option>
+                <option value="false">Inactivos</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Búsqueda por ID -->
+        <div *ngIf="searchType === 'id'" class="specific-search">
+          <div class="search-input-group">
+            <label for="userId">ID del Usuario:</label>
+            <input 
+              id="userId"
+              type="number" 
+              [(ngModel)]="searchValue"
+              (keyup.enter)="executeSearch()"
+              placeholder="Ej: 1, 2, 3..."
+              class="search-input"
+              min="1">
+            <small>Ingresa el ID numérico del usuario que buscas</small>
+          </div>
+        </div>
+
+        <!-- Búsqueda por Email -->
+        <div *ngIf="searchType === 'email'" class="specific-search">
+          <div class="search-input-group">
+            <label for="userEmail">Email del Usuario:</label>
+            <input 
+              id="userEmail"
+              type="email" 
+              [(ngModel)]="searchValue"
+              (keyup.enter)="executeSearch()"
+              placeholder="usuario@ejemplo.com"
+              class="search-input">
+            <small>Ingresa la dirección de email exacta del usuario</small>
+          </div>
+        </div>
+
+        <!-- Búsqueda por Rol -->
+        <div *ngIf="searchType === 'role'" class="specific-search">
+          <div class="search-input-group">
+            <label for="userRole">Rol Específico:</label>
+            <select 
+              id="userRole"
+              [(ngModel)]="searchValue"
+              class="search-input">
+              <option value="">Selecciona un rol</option>
+              <option value="ADMIN">ADMIN</option>
+              <option value="VETERINARIAN">VETERINARIAN</option>
+              <option value="RECEPTIONIST">RECEPTIONIST</option>
+            </select>
+            <small>Muestra todos los usuarios que tienen este rol específico</small>
+          </div>
+        </div>
+
+        <!-- Búsqueda de Activos -->
+        <div *ngIf="searchType === 'active'" class="specific-search">
+          <div class="search-info">
+            <app-icon name="info"></app-icon>
+            <p>Esta búsqueda mostrará únicamente los usuarios que están activos en el sistema.</p>
+          </div>
+        </div>
+
+        <!-- Búsqueda de Veterinarios con Stats -->
+        <div *ngIf="searchType === 'stats'" class="specific-search">
+          <div class="search-info">
+            <app-icon name="analytics"></app-icon>
+            <p>Esta búsqueda mostrará todos los veterinarios junto con sus estadísticas de consultas, vacunaciones y citas.</p>
+          </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="filter-actions">
+          <app-button 
+            variant="primary" 
+            (buttonClick)="executeSearch()"
+            [disabled]="loading">
+            <app-icon name="search"></app-icon>
+            <span>Buscar</span>
+          </app-button>
+
+          <button 
+            class="clear-filters-btn" 
+            (click)="clearFilters()" 
+            *ngIf="hasActiveFilters() || isSearching"
+            [disabled]="loading">
+            <app-icon name="clear"></app-icon>
+            <span>Mostrar Todos</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Indicador de modo de búsqueda -->
+      <div class="search-status" *ngIf="isSearching && !loading">
+        <div class="status-info">
+          <app-icon name="search"></app-icon>
+          <span>{{ searchResultType }}</span>
+          <span class="result-count" *ngIf="totalElements > 0">
+            ({{ totalElements }} resultado{{ totalElements !== 1 ? 's' : '' }})
+          </span>
+        </div>
+        <button class="show-all-btn" (click)="clearFilters()">
+          <app-icon name="clear"></app-icon>
+          Ver todos los usuarios
+        </button>
+      </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="stats-section">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <app-icon name="group"></app-icon>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{ totalUsers }}</div>
+          <div class="stat-label">Total Usuarios</div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon active">
+          <app-icon name="check_circle"></app-icon>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{ activeUsers }}</div>
+          <div class="stat-label">Activos</div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon veterinarian">
+          <app-icon name="medical_services"></app-icon>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{ veterinarians }}</div>
+          <div class="stat-label">Veterinarios</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Estado de carga -->
+    <div *ngIf="loading" class="loading-section">
+      <app-spinner size="large"></app-spinner>
+      <p>Cargando usuarios...</p>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="content-section" *ngIf="!loading">
+      <!-- Mensaje cuando no hay usuarios -->
+      <div *ngIf="users && users.length === 0" class="empty-state">
+        <app-icon name="people_outline" class="empty-icon"></app-icon>
+        <h3>No se encontraron usuarios</h3>
+        <p>No hay usuarios que coincidan con los criterios de búsqueda</p>
+        <app-button variant="primary" (buttonClick)="createUser()">
+          <app-icon name="add"></app-icon>
+          <span>Crear primer usuario</span>
+        </app-button>
+      </div>
+
+      <!-- Grid de usuarios -->
+      <div class="users-grid" *ngIf="users && users.length > 0">
+        <div class="user-card" *ngFor="let user of users" (click)="viewUser(user.id)">
+          <div class="user-avatar">
+            <app-avatar [name]="user.name" [lastName]="user.lastName" [photoUrl]="user.photoUrl || ''" size="medium"></app-avatar>
+          </div>
+          <div class="user-details">
+            <h3>{{ user.name }} {{ user.lastName }}</h3>
+            <p class="user-role">{{ getRoleDisplay(user.role) }}</p>
+            <p class="user-email">{{ user.email }}</p>
+            <div class="user-status" [class.active]="user.active">
+              {{ user.active ? 'Activo' : 'Inactivo' }}
+            </div>
+            <div class="user-meta" *ngIf="user.lastAccess">
+              <small>Último acceso: {{ user.lastAccess | date:'short' }}</small>
+            </div>
+          </div>
+          <div class="user-actions">
+            <button class="action-btn" (click)="editUser(user.id); $event.stopPropagation()" title="Editar usuario">
+              <app-icon name="edit"></app-icon>
+            </button>
+            <button class="action-btn danger" (click)="deleteUser(user.id); $event.stopPropagation()" title="Eliminar usuario">
+              <app-icon name="delete"></app-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Información de paginación -->
+      <div class="pagination-info" *ngIf="users && users.length > 0">
+        <p>
+          Mostrando {{ users.length }} de {{ totalElements }} usuarios
+          (Página {{ currentPage + 1 }} de {{ totalPages }})
+        </p>
+      </div>
+
+      <!-- Controles de paginación -->
+      <div class="pagination-controls" *ngIf="totalPages > 1">
+        <button 
+          class="pagination-btn" 
+          [disabled]="currentPage === 0"
+          (click)="onPageChange(0)">
+          <app-icon name="first_page"></app-icon>
+          <span>Primera</span>
+        </button>
+
+        <button 
+          class="pagination-btn" 
+          [disabled]="currentPage === 0"
+          (click)="onPageChange(currentPage - 1)">
+          <app-icon name="chevron_left"></app-icon>
+          <span>Anterior</span>
+        </button>
+
+        <!-- Números de página -->
+        <div class="page-numbers">
+          <button 
+            *ngFor="let page of getPageNumbers()" 
+            class="page-number-btn"
+            [class.active]="page === currentPage"
+            (click)="onPageChange(page)">
+            {{ page + 1 }}
+          </button>
+        </div>
+
+        <button 
+          class="pagination-btn" 
+          [disabled]="currentPage === totalPages - 1"
+          (click)="onPageChange(currentPage + 1)">
+          <span>Siguiente</span>
+          <app-icon name="chevron_right"></app-icon>
+        </button>
+
+        <button 
+          class="pagination-btn" 
+          [disabled]="currentPage === totalPages - 1"
+          (click)="onPageChange(totalPages - 1)">
+          <span>Última</span>
+          <app-icon name="last_page"></app-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+</app-dashboard-layout>

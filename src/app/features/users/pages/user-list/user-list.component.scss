@@ -1,0 +1,679 @@
+@use '../../../../../assets/styles/base/variables' as *;
+
+.user-list-page {
+  .page-header {
+    margin-bottom: $spacing-xl;
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: $spacing-md;
+
+      .title-section {
+        h1 {
+          margin: 0 0 $spacing-xs 0;
+          color: $neutral-dark;
+          font-size: $font-size-3xl;
+          font-weight: $font-weight-bold;
+        }
+
+        p {
+          margin: 0;
+          color: $neutral-medium;
+          font-size: $font-size-md;
+        }
+      }
+
+      .header-actions {
+        display: flex;
+        gap: $spacing-sm;
+      }
+    }
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+      font-size: $font-size-sm;
+      color: $neutral-medium;
+
+      a {
+        color: $primary;
+        text-decoration: none;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+
+      app-icon {
+        font-size: 16px;
+      }
+    }
+  }
+
+  // Filtros de búsqueda
+  .filters-section {
+    margin-bottom: $spacing-xl;
+    background: $neutral-light;
+    padding: $spacing-lg;
+    border-radius: $border-radius-lg;
+    box-shadow: $shadow-sm;
+
+    // Selector de tipo de búsqueda
+    .search-type-selector {
+      margin-bottom: $spacing-lg;
+      
+      label {
+        display: block;
+        font-size: $font-size-md;
+        font-weight: $font-weight-bold;
+        color: $neutral-dark;
+        margin-bottom: $spacing-xs;
+      }
+
+      .search-type-select {
+        width: 100%;
+        max-width: 400px;
+        padding: $spacing-sm;
+        border: 2px solid $primary;
+        border-radius: $border-radius-md;
+        font-size: $font-size-md;
+        background-color: $neutral-light;
+        color: $neutral-dark;
+        font-weight: $font-weight-medium;
+        transition: $transition-default;
+
+        &:focus {
+          outline: none;
+          border-color: $secondary;
+          box-shadow: 0 0 0 3px rgba($primary, 0.1);
+        }
+      }
+
+      .search-description {
+        display: block;
+        margin-top: $spacing-xs;
+        font-size: $font-size-sm;
+        color: $neutral-medium;
+        font-style: italic;
+      }
+    }
+
+    // Campos de búsqueda dinámicos
+    .search-fields {
+      
+      // Búsqueda general (filtros múltiples)
+      .general-search {
+        .filters-row {
+          display: grid;
+          grid-template-columns: 2fr 1fr 1fr;
+          gap: $spacing-md;
+          align-items: end;
+          margin-bottom: $spacing-md;
+
+          @media (max-width: $breakpoint-md) {
+            grid-template-columns: 1fr;
+            gap: $spacing-sm;
+          }
+        }
+      }
+
+      // Búsquedas específicas
+      .specific-search {
+        margin-bottom: $spacing-md;
+
+        .search-input-group {
+          max-width: 500px;
+
+          label {
+            display: block;
+            font-size: $font-size-md;
+            font-weight: $font-weight-medium;
+            color: $neutral-dark;
+            margin-bottom: $spacing-xs;
+          }
+
+          .search-input {
+            width: 100%;
+            padding: $spacing-sm $spacing-md;
+            border: 1px solid $neutral-medium;
+            border-radius: $border-radius-md;
+            font-size: $font-size-md;
+            background-color: $neutral-light;
+            transition: $transition-default;
+
+            &:focus {
+              outline: none;
+              border-color: $primary;
+              box-shadow: 0 0 0 2px rgba($primary, 0.1);
+            }
+
+            &::placeholder {
+              color: $neutral-medium;
+            }
+          }
+
+          small {
+            display: block;
+            margin-top: $spacing-xs;
+            font-size: $font-size-xs;
+            color: $neutral-medium;
+          }
+        }
+
+        .search-info {
+          display: flex;
+          align-items: flex-start;
+          gap: $spacing-sm;
+          padding: $spacing-md;
+          background: rgba($primary, 0.05);
+          border: 1px solid rgba($primary, 0.2);
+          border-radius: $border-radius-md;
+          max-width: 500px;
+
+          app-icon {
+            color: $primary;
+            font-size: 20px;
+            margin-top: 2px;
+            flex-shrink: 0;
+          }
+
+          p {
+            margin: 0;
+            font-size: $font-size-sm;
+            color: $neutral-dark;
+            line-height: $line-height-normal;
+          }
+        }
+      }
+
+      // Elementos comunes para todos los tipos
+      .filter-item {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-xs;
+
+        label {
+          font-size: $font-size-sm;
+          font-weight: $font-weight-medium;
+          color: $neutral-dark;
+        }
+
+        .search-input,
+        .filter-select {
+          padding: $spacing-sm;
+          border: 1px solid $neutral-medium;
+          border-radius: $border-radius-md;
+          font-size: $font-size-sm;
+          background-color: $neutral-light;
+          transition: $transition-default;
+
+          &:focus {
+            outline: none;
+            border-color: $primary;
+            box-shadow: 0 0 0 2px rgba($primary, 0.1);
+          }
+
+          &::placeholder {
+            color: $neutral-medium;
+          }
+        }
+      }
+
+      // Botones de acción
+      .filter-actions {
+        display: flex;
+        align-items: center;
+        gap: $spacing-md;
+        margin-top: $spacing-lg;
+        
+        @media (max-width: $breakpoint-md) {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .clear-filters-btn {
+          display: flex;
+          align-items: center;
+          gap: $spacing-xs;
+          padding: $spacing-sm $spacing-md;
+          background: none;
+          border: 1px solid $neutral-medium;
+          border-radius: $border-radius-md;
+          color: $neutral-medium;
+          font-size: $font-size-sm;
+          cursor: pointer;
+          transition: $transition-default;
+          white-space: nowrap;
+
+          &:hover:not(:disabled) {
+            background-color: rgba($warning, 0.1);
+            border-color: $warning;
+            color: $warning;
+          }
+
+          &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+          }
+
+          app-icon {
+            font-size: 16px;
+          }
+        }
+      }
+    }
+
+    // Indicador de estado de búsqueda mejorado
+    .search-status {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: $spacing-md;
+      margin-top: $spacing-lg;
+      padding: $spacing-md $spacing-lg;
+      background: linear-gradient(135deg, rgba($primary, 0.1), rgba($secondary, 0.05));
+      border: 1px solid rgba($primary, 0.2);
+      border-radius: $border-radius-lg;
+      font-size: $font-size-sm;
+
+      @media (max-width: $breakpoint-md) {
+        flex-direction: column;
+        gap: $spacing-sm;
+      }
+
+      .status-info {
+        display: flex;
+        align-items: center;
+        gap: $spacing-sm;
+        color: $primary;
+        font-weight: $font-weight-medium;
+
+        app-icon {
+          font-size: 18px;
+        }
+
+        .result-count {
+          color: $secondary;
+          font-weight: $font-weight-bold;
+        }
+      }
+
+      .show-all-btn {
+        display: flex;
+        align-items: center;
+        gap: $spacing-xs;
+        padding: $spacing-xs $spacing-md;
+        background: $primary;
+        border: none;
+        border-radius: $border-radius-md;
+        color: $neutral-light;
+        font-size: $font-size-sm;
+        font-weight: $font-weight-medium;
+        cursor: pointer;
+        transition: $transition-default;
+
+        &:hover {
+          background: rgba($primary, 0.8);
+          transform: translateY(-1px);
+        }
+
+        app-icon {
+          font-size: 14px;
+        }
+      }
+    }
+  }
+
+  .stats-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: $spacing-md;
+    margin-bottom: $spacing-xl;
+
+    .stat-card {
+      background: $neutral-light;
+      border-radius: $border-radius-lg;
+      padding: $spacing-lg;
+      display: flex;
+      align-items: center;
+      gap: $spacing-md;
+      box-shadow: $shadow-sm;
+      transition: $transition-default;
+
+      &:hover {
+        box-shadow: $shadow-md;
+      }
+
+      .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: $border-radius-circle;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba($primary, 0.1);
+        color: $primary;
+
+        &.active {
+          background-color: rgba($success, 0.1);
+          color: $success;
+        }
+
+        &.veterinarian {
+          background-color: rgba($secondary, 0.1);
+          color: $secondary;
+        }
+
+        app-icon {
+          font-size: 24px;
+        }
+      }
+
+      .stat-info {
+        .stat-value {
+          font-size: $font-size-2xl;
+          font-weight: $font-weight-bold;
+          color: $neutral-dark;
+          margin-bottom: $spacing-xxs;
+        }
+
+        .stat-label {
+          font-size: $font-size-sm;
+          color: $neutral-medium;
+        }
+      }
+    }
+  }
+
+  // Estado de carga
+  .loading-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: $spacing-3xl $spacing-md;
+    text-align: center;
+
+    app-spinner {
+      margin-bottom: $spacing-md;
+    }
+
+    p {
+      margin: 0;
+      color: $neutral-medium;
+      font-size: $font-size-md;
+    }
+  }
+
+  // Estado vacío
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: $spacing-3xl $spacing-md;
+    text-align: center;
+    background: $neutral-light;
+    border-radius: $border-radius-lg;
+    box-shadow: $shadow-sm;
+
+    .empty-icon {
+      font-size: 64px;
+      color: $neutral-medium;
+      margin-bottom: $spacing-md;
+    }
+
+    h3 {
+      margin: 0 0 $spacing-xs 0;
+      color: $neutral-dark;
+      font-size: $font-size-xl;
+      font-weight: $font-weight-bold;
+    }
+
+    p {
+      margin: 0 0 $spacing-lg 0;
+      color: $neutral-medium;
+      font-size: $font-size-md;
+    }
+  }
+
+  .content-section {
+    .users-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: $spacing-md;
+
+      .user-card {
+        background: $neutral-light;
+        border-radius: $border-radius-lg;
+        padding: $spacing-lg;
+        box-shadow: $shadow-sm;
+        transition: $transition-default;
+        cursor: pointer;
+        position: relative;
+
+        &:hover {
+          box-shadow: $shadow-md;
+          transform: translateY(-2px);
+        }
+
+        .user-avatar {
+          display: flex;
+          justify-content: center;
+          margin-bottom: $spacing-md;
+        }
+
+        .user-details {
+          text-align: center;
+          margin-bottom: $spacing-md;
+
+          h3 {
+            margin: 0 0 $spacing-xs 0;
+            font-size: $font-size-lg;
+            font-weight: $font-weight-bold;
+            color: $neutral-dark;
+          }
+
+          .user-role {
+            margin: 0 0 $spacing-xs 0;
+            font-size: $font-size-sm;
+            color: $primary;
+            font-weight: $font-weight-medium;
+          }
+
+          .user-email {
+            margin: 0 0 $spacing-sm 0;
+            font-size: $font-size-sm;
+            color: $neutral-medium;
+          }
+
+          .user-status {
+            display: inline-block;
+            padding: $spacing-xxs $spacing-xs;
+            border-radius: $border-radius-sm;
+            font-size: $font-size-xs;
+            font-weight: $font-weight-medium;
+            background-color: rgba($error, 0.1);
+            color: $error;
+            margin-bottom: $spacing-xs;
+
+            &.active {
+              background-color: rgba($success, 0.1);
+              color: $success;
+            }
+          }
+
+          .user-meta {
+            small {
+              color: $neutral-medium;
+              font-size: $font-size-xs;
+            }
+          }
+        }
+
+        .user-actions {
+          display: flex;
+          justify-content: center;
+          gap: $spacing-xs;
+
+          .action-btn {
+            background: none;
+            border: 1px solid $neutral-medium;
+            border-radius: $border-radius-sm;
+            padding: $spacing-xs;
+            cursor: pointer;
+            transition: $transition-default;
+            color: $neutral-medium;
+
+            &:hover {
+              background-color: rgba($primary, 0.1);
+              border-color: $primary;
+              color: $primary;
+            }
+
+            &.danger:hover {
+              background-color: rgba($error, 0.1);
+              border-color: $error;
+              color: $error;
+            }
+
+            app-icon {
+              font-size: 16px;
+            }
+          }
+        }
+      }
+    }
+
+    // Información de paginación
+    .pagination-info {
+      margin-top: $spacing-lg;
+      text-align: center;
+
+      p {
+        margin: 0;
+        color: $neutral-medium;
+        font-size: $font-size-sm;
+        padding: $spacing-md;
+        background: $neutral-light;
+        border-radius: $border-radius-md;
+        box-shadow: $shadow-sm;
+      }
+    }
+
+    // Controles de paginación
+    .pagination-controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: $spacing-sm;
+      margin-top: $spacing-lg;
+      padding: $spacing-lg;
+
+      .pagination-btn {
+        display: flex;
+        align-items: center;
+        gap: $spacing-xs;
+        padding: $spacing-sm $spacing-md;
+        background: $neutral-light;
+        border: 1px solid $neutral-medium;
+        border-radius: $border-radius-md;
+        color: $neutral-dark;
+        font-size: $font-size-sm;
+        cursor: pointer;
+        transition: $transition-default;
+
+        &:hover:not(:disabled) {
+          background: $primary;
+          border-color: $primary;
+          color: $neutral-light;
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+          background: $neutral-bg;
+          color: $neutral-medium;
+        }
+
+        app-icon {
+          font-size: 16px;
+        }
+      }
+
+      .page-numbers {
+        display: flex;
+        gap: $spacing-xs;
+
+        .page-number-btn {
+          width: 40px;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: $neutral-light;
+          border: 1px solid $neutral-medium;
+          border-radius: $border-radius-md;
+          color: $neutral-dark;
+          font-size: $font-size-sm;
+          font-weight: $font-weight-medium;
+          cursor: pointer;
+          transition: $transition-default;
+
+          &:hover {
+            background: $primary;
+            border-color: $primary;
+            color: $neutral-light;
+          }
+
+          &.active {
+            background: $primary;
+            border-color: $primary;
+            color: $neutral-light;
+            font-weight: $font-weight-bold;
+          }
+        }
+      }
+
+      // Responsive
+      @media (max-width: $breakpoint-sm) {
+        flex-wrap: wrap;
+        gap: $spacing-xs;
+
+        .pagination-btn {
+          span {
+            display: none;
+          }
+        }
+
+        .page-numbers .page-number-btn {
+          width: 35px;
+          height: 35px;
+        }
+      }
+    }
+  }
+}
+
+// Responsive
+@media (max-width: $breakpoint-md) {
+  .user-list-page {
+    .page-header {
+      .header-content {
+        flex-direction: column;
+        gap: $spacing-md;
+      }
+    }
+
+    .stats-section {
+      grid-template-columns: 1fr;
+    }
+
+    .users-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+}

@@ -1,0 +1,212 @@
+<div class="home-page">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-text">
+          <h1>
+            <span class="brand">VetApp</span>
+            <span class="tagline">Sistema de Gestión Veterinaria</span>
+          </h1>
+          <p class="hero-description">
+            La solución completa para la gestión de tu clínica veterinaria. 
+            Administra citas, expedientes de mascotas, tratamientos y más, 
+            todo en una plataforma intuitiva y segura.
+          </p>
+          <div class="hero-actions">
+            <app-button variant="primary" size="lg" routerLink="/auth/login">
+              <app-icon name="login"></app-icon>
+              <span>Iniciar Sesión</span>
+            </app-button>
+            <app-button variant="secondary" size="lg" (buttonClick)="scrollToSection('features')">
+              <app-icon name="info"></app-icon>
+              <span>Conocer Más</span>
+            </app-button>
+          </div>
+        </div>
+        <div class="hero-image">
+          <div class="hero-illustration">
+            <app-icon name="pets"></app-icon>
+            <div class="floating-cards">
+              <div class="card card-1">
+                <app-icon name="calendar_today"></app-icon>
+                <span>Citas</span>
+              </div>
+              <div class="card card-2">
+                <app-icon name="medical_services"></app-icon>
+                <span>Consultas</span>
+              </div>
+              <div class="card card-3">
+                <app-icon name="people"></app-icon>
+                <span>Clientes</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" class="features-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>¿Por qué elegir VetApp?</h2>
+        <p>Todas las herramientas que necesitas para gestionar tu clínica veterinaria de manera eficiente</p>
+      </div>
+      
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <app-icon name="calendar_today"></app-icon>
+          </div>
+          <h3>Gestión de Citas</h3>
+          <p>Programa y administra citas de manera sencilla. Sistema de recordatorios automáticos para clientes.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <app-icon name="folder_shared"></app-icon>
+          </div>
+          <h3>Expedientes Digitales</h3>
+          <p>Mantén el historial médico completo de cada mascota organizado y fácilmente accesible.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <app-icon name="inventory"></app-icon>
+          </div>
+          <h3>Control de Inventario</h3>
+          <p>Gestiona medicamentos y suministros. Alertas automáticas para productos con stock bajo.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <app-icon name="analytics"></app-icon>
+          </div>
+          <h3>Reportes y Estadísticas</h3>
+          <p>Obtén insights valiosos sobre tu negocio con reportes detallados y análisis de rendimiento.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <app-icon name="people"></app-icon>
+          </div>
+          <h3>Gestión de Clientes</h3>
+          <p>Base de datos completa de clientes y sus mascotas con historial de interacciones.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <app-icon name="security"></app-icon>
+          </div>
+          <h3>Seguridad Garantizada</h3>
+          <p>Tus datos están protegidos con encriptación de nivel empresarial y respaldos automáticos.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="stats-section">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-number">500+</div>
+          <div class="stat-label">Clínicas Activas</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">10K+</div>
+          <div class="stat-label">Mascotas Registradas</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">99.9%</div>
+          <div class="stat-label">Tiempo de Actividad</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">24/7</div>
+          <div class="stat-label">Soporte Técnico</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section id="faq" class="faq-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Preguntas Frecuentes</h2>
+        <p>Encuentra respuestas a las dudas más comunes sobre VetApp</p>
+      </div>
+
+      <div class="faq-list">
+        <div class="faq-item" *ngFor="let faq of faqs; let i = index">
+          <div class="faq-question" (click)="toggleFaq(i)">
+            <h4>{{ faq.question }}</h4>
+            <app-icon [name]="faq.expanded ? 'expand_less' : 'expand_more'"></app-icon>
+          </div>
+          <div class="faq-answer" [class.expanded]="faq.expanded">
+            <p>{{ faq.answer }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-content">
+        <h2>¿Listo para modernizar tu clínica veterinaria?</h2>
+        <p>Únete a cientos de veterinarios que ya confían en VetApp para gestionar sus clínicas</p>
+        <div class="cta-actions">
+          <app-button variant="primary" size="lg" routerLink="/auth/login">
+            <app-icon name="login"></app-icon>
+            <span>Comenzar Ahora</span>
+          </app-button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <h3>VetApp</h3>
+          <p>Sistema de gestión veterinaria confiable y fácil de usar</p>
+        </div>
+        <div class="footer-links">
+          <div class="footer-column">
+            <h4>Producto</h4>
+            <ul>
+              <li><a href="#features">Características</a></li>
+              <li><a href="#pricing">Precios</a></li>
+              <li><a href="#demo">Demo</a></li>
+            </ul>
+          </div>
+          <div class="footer-column">
+            <h4>Soporte</h4>
+            <ul>
+              <li><a href="#faq">FAQ</a></li>
+              <li><a href="#help">Centro de Ayuda</a></li>
+              <li><a href="#contact">Contacto</a></li>
+            </ul>
+          </div>
+          <div class="footer-column">
+            <h4>Empresa</h4>
+            <ul>
+              <li><a href="#about">Acerca de</a></li>
+              <li><a href="#blog">Blog</a></li>
+              <li><a href="#careers">Carreras</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 VetApp. Todos los derechos reservados.</p>
+      </div>
+    </div>
+  </footer>
+</div> 

@@ -1,1 +1,96 @@
-<p>sidebar works!</p>
+<aside class="sidebar" [class.collapsed]="isCollapsed">
+  <!-- Logo y header -->
+  <div class="sidebar-header">
+    <div class="logo" routerLink="/dashboard">
+      <app-icon name="pets" class="logo-icon"></app-icon>
+      <span class="logo-text" *ngIf="!isCollapsed">VetApp</span>
+    </div>
+    
+    <button class="collapse-btn" (click)="toggleSidebar()" [attr.aria-label]="isCollapsed ? 'Expandir menú' : 'Contraer menú'">
+      <app-icon [name]="isCollapsed ? 'menu' : 'close'"></app-icon>
+    </button>
+  </div>
+
+  <!-- Información del usuario logueado -->
+  <div class="user-info" *ngIf="currentUser">
+    <div class="user-avatar">
+      <app-avatar [name]="currentUser.name" [lastName]="currentUser.lastName" size="medium"></app-avatar>
+    </div>
+    <div class="user-details" *ngIf="!isCollapsed">
+      <div class="user-name">{{ currentUser.name }} {{ currentUser.lastName }}</div>
+      <div class="user-role">{{ getUserRoleDisplay(currentUser.role) }}</div>
+    </div>
+  </div>
+
+  <!-- Navegación principal -->
+  <nav class="sidebar-nav">
+    <ul class="nav-list">
+      <!-- Dashboard -->
+      <li class="nav-item">
+        <a routerLink="/dashboard" routerLinkActive="active" class="nav-link">
+          <app-icon name="dashboard" class="nav-icon"></app-icon>
+          <span class="nav-text" *ngIf="!isCollapsed">Dashboard</span>
+        </a>
+      </li>
+
+      <!-- Clientes -->
+      <li class="nav-item">
+        <a routerLink="/clientes" routerLinkActive="active" class="nav-link">
+          <app-icon name="people" class="nav-icon"></app-icon>
+          <span class="nav-text" *ngIf="!isCollapsed">Clientes</span>
+        </a>
+      </li>
+
+      <!-- Mascotas -->
+      <li class="nav-item">
+        <a routerLink="/mascotas" routerLinkActive="active" class="nav-link">
+          <app-icon name="pets" class="nav-icon"></app-icon>
+          <span class="nav-text" *ngIf="!isCollapsed">Mascotas</span>
+        </a>
+      </li>
+
+      <!-- Citas -->
+      <li class="nav-item">
+        <a routerLink="/citas" routerLinkActive="active" class="nav-link">
+          <app-icon name="event" class="nav-icon"></app-icon>
+          <span class="nav-text" *ngIf="!isCollapsed">Citas</span>
+        </a>
+      </li>
+
+      <!-- Consultas -->
+      <li class="nav-item">
+        <a routerLink="/consultas" routerLinkActive="active" class="nav-link">
+          <app-icon name="medical_services" class="nav-icon"></app-icon>
+          <span class="nav-text" *ngIf="!isCollapsed">Consultas</span>
+        </a>
+      </li>
+
+      <!-- Usuarios (solo para admins) -->
+      <li class="nav-item" *ngIf="canAccessUsers()">
+        <a routerLink="/usuarios" routerLinkActive="active" class="nav-link">
+          <app-icon name="group" class="nav-icon"></app-icon>
+          <span class="nav-text" *ngIf="!isCollapsed">Usuarios</span>
+        </a>
+      </li>
+
+      <!-- Divider -->
+      <li class="nav-divider" *ngIf="!isCollapsed"></li>
+
+      <!-- Configuración -->
+      <li class="nav-item">
+        <a routerLink="/configuracion" routerLinkActive="active" class="nav-link">
+          <app-icon name="settings" class="nav-icon"></app-icon>
+          <span class="nav-text" *ngIf="!isCollapsed">Configuración</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Footer con cerrar sesión -->
+  <div class="sidebar-footer">
+    <button class="logout-btn" (click)="logout()" [attr.aria-label]="'Cerrar sesión'">
+      <app-icon name="logout" class="nav-icon"></app-icon>
+      <span class="nav-text" *ngIf="!isCollapsed">Cerrar Sesión</span>
+    </button>
+  </div>
+</aside>

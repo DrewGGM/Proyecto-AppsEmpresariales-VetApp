@@ -1,0 +1,200 @@
+<app-dashboard-layout>
+  <div class="dashboard-main">
+    
+    <!-- Loading state -->
+    <div *ngIf="loading" class="loading-section">
+      <app-spinner size="large"></app-spinner>
+      <p>Cargando información del dashboard...</p>
+    </div>
+
+    <!-- Dashboard content -->
+    <div *ngIf="!loading">
+      
+      <!-- Welcome Section -->
+      <div class="welcome-section">
+        <div class="welcome-content">
+          <div class="welcome-text">
+            <h1>{{ getGreeting() }}, {{ getUserDisplayName() }}!</h1>
+            <p>Aquí tienes un resumen de la actividad de tu clínica veterinaria</p>
+          </div>
+          <div class="welcome-date">
+            <div class="current-date">
+              <app-icon name="today"></app-icon>
+              <span>{{ 'now' | date:'fullDate' }}</span>
+            </div>
+            <div class="refresh-action">
+              <app-button variant="secondary" size="sm" (buttonClick)="refreshData()">
+                <app-icon name="refresh"></app-icon>
+                <span>Actualizar</span>
+              </app-button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Stats Section -->
+      <div class="quick-stats-section">
+        <h2 class="section-title">
+          <app-icon name="analytics"></app-icon>
+          Estadísticas del Sistema
+        </h2>
+        
+        <div class="stats-grid">
+          <div 
+            *ngFor="let stat of quickStats" 
+            class="stat-card"
+            [ngClass]="getStatColorClass(stat.color)">
+            <div class="stat-icon">
+              <app-icon [name]="stat.icon"></app-icon>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">{{ stat.value }}</div>
+              <div class="stat-label">{{ stat.label }}</div>
+              <div class="stat-change" [ngClass]="getChangeClass(stat.changeType)">
+                <app-icon [name]="stat.changeType === 'positive' ? 'trending_up' : stat.changeType === 'negative' ? 'trending_down' : 'trending_flat'"></app-icon>
+                <span>{{ stat.change }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content Grid -->
+      <div class="main-content-grid">
+        
+        <!-- Quick Actions -->
+        <div class="quick-actions-section">
+          <h2 class="section-title">
+            <app-icon name="flash_on"></app-icon>
+            Acciones Rápidas
+          </h2>
+          
+          <div class="actions-grid">
+            <div 
+              *ngFor="let action of quickActions" 
+              class="action-card"
+              [ngClass]="getActionColorClass(action.color)"
+              [routerLink]="action.route"
+              [queryParams]="!action.implemented ? { featureName: action.label } : null">
+              <div class="action-icon">
+                <app-icon [name]="action.icon"></app-icon>
+              </div>
+              <div class="action-content">
+                <h3>{{ action.label }}</h3>
+                <p>{{ action.description }}</p>
+                <span *ngIf="!action.implemented" class="development-badge">En desarrollo</span>
+              </div>
+              <div class="action-arrow">
+                <app-icon name="arrow_forward"></app-icon>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="recent-activity-section">
+          <h2 class="section-title">
+            <app-icon name="history"></app-icon>
+            Actividad Reciente
+          </h2>
+          
+          <div class="activity-list" *ngIf="recentActivity.length > 0; else noActivityTemplate">
+            <div 
+              *ngFor="let activity of recentActivity" 
+              class="activity-item">
+              <div class="activity-icon" [ngClass]="'activity-' + activity.color">
+                <app-icon [name]="activity.icon"></app-icon>
+              </div>
+              <div class="activity-content">
+                <div class="activity-title">{{ activity.title }}</div>
+                <div class="activity-description">{{ activity.description }}</div>
+                <div class="activity-time">{{ activity.time }}</div>
+              </div>
+            </div>
+          </div>
+          
+          <ng-template #noActivityTemplate>
+            <div class="no-activity">
+              <app-icon name="inbox"></app-icon>
+              <p>No hay actividad reciente para mostrar</p>
+            </div>
+          </ng-template>
+          
+          <div class="activity-footer" *ngIf="recentActivity.length > 0">
+            <app-button variant="secondary" routerLink="/usuarios">
+              <span>Ver gestión de usuarios</span>
+              <app-icon name="arrow_forward"></app-icon>
+            </app-button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Getting Started Section (if no users) -->
+      <div class="getting-started-section" *ngIf="quickStats.length > 0 && quickStats[0].value === 0">
+        <div class="getting-started-card">
+          <div class="getting-started-icon">
+            <app-icon name="rocket_launch"></app-icon>
+          </div>
+          <div class="getting-started-content">
+            <h3>¡Bienvenido a VetApp!</h3>
+            <p>Parece que es tu primera vez aquí. Te ayudamos a comenzar:</p>
+            <div class="getting-started-actions">
+              <app-button variant="primary" routerLink="/usuarios/nuevo">
+                <app-icon name="person_add"></app-icon>
+                <span>Crear primer usuario</span>
+              </app-button>
+              <app-button variant="secondary" routerLink="/usuarios">
+                <app-icon name="people"></app-icon>
+                <span>Ver usuarios</span>
+              </app-button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- System Status -->
+      <div class="system-status-section">
+        <h2 class="section-title">
+          <app-icon name="monitor_heart"></app-icon>
+          Estado del Sistema
+        </h2>
+        
+        <div class="status-grid">
+          <div class="status-item">
+            <div class="status-icon success">
+              <app-icon name="check_circle"></app-icon>
+            </div>
+            <div class="status-content">
+              <h4>API Backend</h4>
+              <p>Conectado y funcionando</p>
+              <span class="status-badge success">Operativo</span>
+            </div>
+          </div>
+          
+          <div class="status-item">
+            <div class="status-icon success">
+              <app-icon name="storage"></app-icon>
+            </div>
+            <div class="status-content">
+              <h4>Base de Datos</h4>
+              <p>Conexión estable</p>
+              <span class="status-badge success">Operativo</span>
+            </div>
+          </div>
+          
+          <div class="status-item">
+            <div class="status-icon warning">
+              <app-icon name="construction"></app-icon>
+            </div>
+            <div class="status-content">
+              <h4>Módulos Adicionales</h4>
+              <p>Mascotas, citas, inventario</p>
+              <span class="status-badge warning">En desarrollo</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</app-dashboard-layout> 

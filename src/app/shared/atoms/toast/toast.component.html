@@ -1,0 +1,19 @@
+<div [ngClass]="typeClasses">
+  <div class="toast-content">
+    <app-icon [name]="iconName" class="toast-icon"></app-icon>
+    
+    <div class="toast-message">
+      <h4 *ngIf="toast.title" class="toast-title">{{ toast.title }}</h4>
+      <p class="toast-text">{{ toast.message }}</p>
+    </div>
+  </div>
+  
+  <button 
+    *ngIf="toast.showCloseButton" 
+    type="button" 
+    class="toast-close"
+    (click)="onClose(); $event.stopPropagation()"
+    aria-label="Cerrar notificación">
+    <app-icon name="close"></app-icon>
+  </button>
+</div> 

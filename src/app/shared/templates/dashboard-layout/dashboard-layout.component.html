@@ -1,1 +1,17 @@
-<p>dashboard-layout works!</p>
+<div class="dashboard-layout">
+  <!-- Sidebar -->
+  <app-sidebar></app-sidebar>
+  
+  <!-- Contenido principal -->
+  <main class="main-content" [class.sidebar-collapsed]="isSidebarCollapsed">
+    <!-- Header opcional para contenido específico -->
+    <header class="content-header" *ngIf="showHeader">
+      <ng-content select="[slot=header]"></ng-content>
+    </header>
+    
+    <!-- Área de contenido principal -->
+    <div class="content-area">
+      <ng-content></ng-content>
+    </div>
+  </main>
+</div>

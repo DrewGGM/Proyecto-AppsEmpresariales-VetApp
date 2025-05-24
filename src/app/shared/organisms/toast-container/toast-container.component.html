@@ -1,0 +1,7 @@
+<div class="toast-container" aria-live="polite" aria-label="Notificaciones">
+  <app-toast
+    *ngFor="let toast of toasts$ | async; trackBy: trackByToastId"
+    [toast]="toast"
+    (close)="onToastClose($event)">
+  </app-toast>
+</div> 

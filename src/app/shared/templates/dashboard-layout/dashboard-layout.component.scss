@@ -1,0 +1,48 @@
+@use '../../../../assets/styles/base/variables' as *;
+
+.dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: $neutral-bg;
+
+  .main-content {
+    flex: 1;
+    margin-left: $sidebar-width;
+    transition: margin-left $transition-default ease-in-out;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+
+    &.sidebar-collapsed {
+      margin-left: $sidebar-collapsed-width;
+    }
+
+    .content-header {
+      background-color: $neutral-light;
+      border-bottom: 1px solid rgba($neutral-medium, 0.2);
+      padding: $spacing-md $spacing-lg;
+      flex-shrink: 0;
+      box-shadow: $shadow-sm;
+    }
+
+    .content-area {
+      flex: 1;
+      padding: $spacing-lg;
+      overflow-y: auto;
+      background-color: $neutral-bg;
+    }
+  }
+}
+
+// Responsive
+@media (max-width: $breakpoint-md) {
+  .dashboard-layout {
+    .main-content {
+      margin-left: 0;
+
+      &.sidebar-collapsed {
+        margin-left: 0;
+      }
+    }
+  }
+}

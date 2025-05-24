@@ -8,4 +8,8 @@ import { Component, Input } from '@angular/core';
 })
 export class SpinnerComponent {
   @Input() size: 'small' | 'medium' | 'large' = 'medium';
+
+  get spinnerClasses(): string {
+    return `spinner-${this.size}`;
+  }
 }

@@ -34,9 +34,14 @@ export class FormFieldComponent implements ControlValueAccessor {
   @Output() input = new EventEmitter<Event>();
 
   value: string = '';
+  private _fieldId: string;
   
   private onChange = (value: string) => {};
   private onTouched = () => {};
+
+  constructor() {
+    this._fieldId = `field-${Math.random().toString(36).substr(2, 9)}`;
+  }
 
   /**
    * ControlValueAccessor implementation
@@ -139,6 +144,6 @@ export class FormFieldComponent implements ControlValueAccessor {
    * Get unique ID for the input
    */
   get fieldId(): string {
-    return `field-${Math.random().toString(36).substr(2, 9)}`;
+    return this._fieldId;
   }
 }

@@ -12,6 +12,7 @@ import { AvatarComponent } from './atoms/avatar/avatar.component';
 import { SpinnerComponent } from './atoms/spinner/spinner.component';
 import { StatusIndicatorComponent } from './atoms/status-indicator/status-indicator.component';
 import { NotificationsBadgeComponent } from './atoms/notifications-badge/notifications-badge.component';
+import { ToastComponent } from './atoms/toast/toast.component';
 
 // Moléculas
 import { FormFieldComponent } from './molecules/form-field/form-field.component';
@@ -28,11 +29,15 @@ import { FiltersComponent } from './organisms/filters/filters.component';
 import { DataTableComponent } from './organisms/data-table/data-table.component';
 import { UserFormComponent } from './organisms/user-form/user-form.component';
 import { StatsPanelComponent } from './organisms/stats-panel/stats-panel.component';
+import { ToastContainerComponent } from './organisms/toast-container/toast-container.component';
 
 // Templates
 import { MainLayoutComponent } from './templates/main-layout/main-layout.component';
 import { AuthLayoutComponent } from './templates/auth-layout/auth-layout.component';
 import { DashboardLayoutComponent } from './templates/dashboard-layout/dashboard-layout.component';
+
+// Pages
+import { UnderDevelopmentComponent } from './pages/under-development/under-development.component';
 
 // Directivas
 import { ClickOutsideDirective } from './directives/click-outside.directive';
@@ -53,6 +58,7 @@ import { SortPipe } from './pipes/sort.pipe';
     SpinnerComponent,
     StatusIndicatorComponent,
     NotificationsBadgeComponent,
+    ToastComponent,
     
     // Moléculas
     FormFieldComponent,
@@ -69,11 +75,15 @@ import { SortPipe } from './pipes/sort.pipe';
     DataTableComponent,
     UserFormComponent,
     StatsPanelComponent,
+    ToastContainerComponent,
     
     // Templates
     MainLayoutComponent,
     AuthLayoutComponent,
     DashboardLayoutComponent,
+    
+    // Pages
+    UnderDevelopmentComponent,
     
     // Directivas
     ClickOutsideDirective,
@@ -105,6 +115,7 @@ import { SortPipe } from './pipes/sort.pipe';
     SpinnerComponent,
     StatusIndicatorComponent,
     NotificationsBadgeComponent,
+    ToastComponent,
     
     // Moléculas
     FormFieldComponent,
@@ -121,11 +132,15 @@ import { SortPipe } from './pipes/sort.pipe';
     DataTableComponent,
     UserFormComponent,
     StatsPanelComponent,
+    ToastContainerComponent,
     
     // Templates
     MainLayoutComponent,
     AuthLayoutComponent,
     DashboardLayoutComponent,
+    
+    // Pages
+    UnderDevelopmentComponent,
     
     // Directivas
     ClickOutsideDirective,

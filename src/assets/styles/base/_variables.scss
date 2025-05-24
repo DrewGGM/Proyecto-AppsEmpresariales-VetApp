@@ -55,6 +55,7 @@ $font-size-3xl: 30px;
 $line-height-compact: 1.3;
 $line-height-normal: 1.5;
 $line-height-spacious: 1.7;
+$line-height-relaxed: 1.7; // Alias para spacious
 
 // Espaciado
 $spacing-xxs: 4px;
@@ -104,3 +105,6 @@ $sidebar-width: 240px;
 $sidebar-collapsed-width: 80px;
 $input-height: 40px;
 $button-height: 40px;
+
+// Color de acento (basado en el documento de diseño)
+$accent: $warning; // Usando el color de advertencia como acento principal

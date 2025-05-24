@@ -8,7 +8,7 @@
   font-family: $font-primary;
   font-size: $font-size-sm;
   font-weight: $font-weight-medium;
-  line-height: $line-height-normal;
+  line-height: 1;
   text-align: center;
   text-decoration: none;
   vertical-align: middle;
@@ -45,6 +45,7 @@
   }
   
   // Ancho completo
+  &.btn-full-width,
   &.w-100 {
     width: 100%;
   }
@@ -101,5 +102,51 @@
     &:hover:not(:disabled) {
       background-color: rgba($primary, 0.1);
     }
+  }
+
+  // Estilos para iconos y contenido
+  .btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0; // Evita que el icono se comprima
+  }
+
+  .btn-content {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1; // Asegura que el texto esté bien alineado
+  }
+
+  .btn-spinner {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  // Asegurar que los iconos mantengan su tamaño
+  app-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  // Mejorar alineación cuando hay icono y texto
+  &:has(.btn-icon) {
+    align-items: center;
+    
+    .btn-content {
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  // Ajuste específico para iconos pequeños en botones
+  app-icon[size="small"] {
+    font-size: 16px !important;
+    width: 16px;
+    height: 16px;
   }
 }

@@ -58,10 +58,15 @@
 
         .brand {
           display: block;
-          background: linear-gradient(45deg, $tertiary, $warning);
+          background: linear-gradient(45deg, #FFFFFF, #FFB400);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
+          font-weight: $font-weight-bold;
+          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+          @supports not (-webkit-background-clip: text) {
+            color: $neutral-light;
+          }
         }
 
         .tagline {

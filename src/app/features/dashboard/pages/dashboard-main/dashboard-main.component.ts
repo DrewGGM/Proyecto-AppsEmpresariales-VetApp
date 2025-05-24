@@ -2,6 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subject, takeUntil, forkJoin } from 'rxjs';
 import { AuthService } from '../../../../core/auth/services/auth.service';
 import { UserService } from '../../../users/services/user.service';
+import { HealthService, SystemStatus } from '../../../../core/services/health.service';
+import { ActivityService, RecentActivity } from '../../../../core/services/activity.service';
 import { UserSession } from '../../../../core/auth/models/user-session.interface';
 import { User } from '../../../users/models/user.interface';
 
@@ -23,14 +25,6 @@ interface QuickAction {
   implemented: boolean;
 }
 
-interface RecentActivity {
-  icon: string;
-  title: string;
-  description: string;
-  time: string;
-  color: string;
-}
-
 @Component({
   selector: 'app-dashboard-main',
   standalone: false,
@@ -48,6 +42,8 @@ export class DashboardMainComponent implements OnInit, OnDestroy {
   currentUser: UserSession | null = null;
   quickStats: QuickStat[] = [];
   recentActivity: RecentActivity[] = [];
+  currentDate = new Date();
+  systemStatus: SystemStatus[] = [];
   
   // Quick Actions (configurables)
   quickActions: QuickAction[] = [
@@ -87,7 +83,9 @@ export class DashboardMainComponent implements OnInit, OnDestroy {
 
   constructor(
     private authService: AuthService,
-    private userService: UserService
+    private userService: UserService,
+    private healthService: HealthService,
+    private activityService: ActivityService
   ) { }
 
   ngOnInit(): void {
@@ -113,22 +111,31 @@ export class DashboardMainComponent implements OnInit, OnDestroy {
   private loadDashboardData(): void {
     this.loading = true;
     
-    // Cargar datos reales de usuarios
+    // Cargar datos reales de usuarios, estado del sistema y actividades
     forkJoin({
       allUsers: this.userService.getAllUsers(),
       activeUsers: this.userService.getActiveUsers(),
-      veterinarians: this.userService.getUsersByRole('VETERINARIAN')
+      veterinarians: this.userService.getUsersByRole('VETERINARIAN'),
+      systemHealth: this.healthService.getAllServicesHealth(),
+      recentActivities: this.activityService.getRecentActivities(10) // Cargar actividades reales
     }).pipe(
       takeUntil(this.destroy$)
     ).subscribe({
       next: (data) => {
-        this.updateQuickStats(data);
-        this.generateRecentActivity(data);
+        this.updateQuickStats({
+          allUsers: data.allUsers,
+          activeUsers: data.activeUsers,
+          veterinarians: data.veterinarians
+        });
+        // Usar actividades reales del backend
+        this.recentActivity = this.activityService.mapToRecentActivities(data.recentActivities.data);
+        this.systemStatus = data.systemHealth;
         this.loading = false;
       },
       error: (error) => {
         console.error('Error loading dashboard data:', error);
         this.loadFallbackStats();
+        this.loadFallbackSystemStatus();
         this.loading = false;
       }
     });
@@ -167,49 +174,8 @@ export class DashboardMainComponent implements OnInit, OnDestroy {
         change: `${Math.round((veterinarians / totalUsers) * 100)}% del equipo`,
         changeType: 'positive',
         color: 'accent'
-      },
-      {
-        icon: 'admin_panel_settings',
-        label: 'Sistema Operativo',
-        value: '99.9%',
-        change: 'Uptime últimos 30 días',
-        changeType: 'positive',
-        color: 'success'
       }
     ];
-  }
-
-  /**
-   * Genera actividad reciente basada en datos reales de usuarios
-   */
-  private generateRecentActivity(data: { allUsers: User[], activeUsers: User[], veterinarians: User[] }): void {
-    const recentUsers = data.allUsers
-      .filter(user => this.isRecentUser(user))
-      .slice(0, 3);
-
-    this.recentActivity = [
-      ...recentUsers.map(user => ({
-        icon: 'person_add',
-        title: 'Nuevo usuario registrado',
-        description: `${user.name} ${user.lastName} se unió como ${this.getRoleDisplayName(user.role)}`,
-        time: user.createdAt ? this.getTimeAgo(user.createdAt.toString()) : 'Fecha desconocida',
-        color: 'primary'
-      })),
-      {
-        icon: 'system_update',
-        title: 'Sistema actualizado',
-        description: 'Se implementaron mejoras en la gestión de usuarios',
-        time: 'Hace 2 días',
-        color: 'info'
-      },
-      {
-        icon: 'backup',
-        title: 'Backup completado',
-        description: 'Respaldo automático de datos realizado exitosamente',
-        time: 'Hace 1 día',
-        color: 'success'
-      }
-    ].slice(0, 4);
   }
 
   /**
@@ -251,51 +217,10 @@ export class DashboardMainComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Verifica si un usuario es reciente (último mes)
-   */
-  private isRecentUser(user: User): boolean {
-    if (!user.createdAt) return false;
-    const oneMonthAgo = new Date();
-    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-    return new Date(user.createdAt) > oneMonthAgo;
-  }
-
-  /**
-   * Obtiene el nombre legible del rol
-   */
-  private getRoleDisplayName(role: string): string {
-    const roleNames: { [key: string]: string } = {
-      'ADMIN': 'Administrador',
-      'VETERINARIAN': 'Veterinario',
-      'RECEPTIONIST': 'Recepcionista'
-    };
-    return roleNames[role] || role;
-  }
-
-  /**
-   * Calcula tiempo transcurrido desde una fecha
-   */
-  private getTimeAgo(dateString: string): string {
-    if (!dateString) return 'Fecha desconocida';
-    
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-    
-    if (diffInHours < 1) return 'Hace menos de 1 hora';
-    if (diffInHours < 24) return `Hace ${diffInHours} horas`;
-    
-    const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays < 7) return `Hace ${diffInDays} días`;
-    
-    const diffInWeeks = Math.floor(diffInDays / 7);
-    return `Hace ${diffInWeeks} semanas`;
-  }
-
-  /**
    * Actualiza los datos del dashboard
    */
   refreshData(): void {
+    this.currentDate = new Date();
     this.loadDashboardData();
   }
 
@@ -338,5 +263,34 @@ export class DashboardMainComponent implements OnInit, OnDestroy {
    */
   getActionColorClass(color: string): string {
     return `action-${color}`;
+  }
+
+  /**
+   * Carga estado de sistema de respaldo en caso de error
+   */
+  private loadFallbackSystemStatus(): void {
+    this.systemStatus = [
+      {
+        icon: 'error',
+        title: 'API Backend',
+        description: 'Error de conexión',
+        status: 'Error',
+        type: 'error'
+      },
+      {
+        icon: 'error',
+        title: 'Base de Datos',
+        description: 'Error de conexión',
+        status: 'Error',
+        type: 'error'
+      },
+      {
+        icon: 'construction',
+        title: 'Módulos Adicionales',
+        description: 'Mascotas, citas, inventario',
+        status: 'En desarrollo',
+        type: 'warning'
+      }
+    ];
   }
 } 

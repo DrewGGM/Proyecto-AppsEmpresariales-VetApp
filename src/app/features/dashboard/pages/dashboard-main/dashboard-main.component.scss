@@ -37,6 +37,16 @@
     position: relative;
     overflow: hidden;
 
+    h1, h2, p, span {
+      color: $neutral-light !important;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    app-icon {
+      color: $neutral-light !important;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    }
+
     &::before {
       content: '';
       position: absolute;
@@ -136,6 +146,12 @@
 
   // Quick Stats Section
   .quick-stats-section {
+    margin-bottom: $spacing-3xl;
+
+    .section-title {
+      margin-top: $spacing-xl;
+    }
+
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -241,6 +257,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: $spacing-xl;
+    margin-bottom: $spacing-3xl;
 
     @media (max-width: $breakpoint-lg) {
       grid-template-columns: 1fr;
@@ -472,6 +489,8 @@
 
   // Getting Started Section
   .getting-started-section {
+    margin-bottom: $spacing-3xl;
+
     .getting-started-card {
       background: linear-gradient(135deg, rgba($primary, 0.05), rgba($secondary, 0.05));
       border: 2px dashed rgba($primary, 0.3);
@@ -521,6 +540,8 @@
 
   // System Status Section
   .system-status-section {
+    margin-bottom: $spacing-3xl;
+
     .status-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));

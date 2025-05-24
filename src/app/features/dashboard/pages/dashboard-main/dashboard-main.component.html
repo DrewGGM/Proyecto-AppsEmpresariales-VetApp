@@ -20,7 +20,7 @@
           <div class="welcome-date">
             <div class="current-date">
               <app-icon name="today"></app-icon>
-              <span>{{ 'now' | date:'fullDate' }}</span>
+              <span>{{ currentDate | date:'fullDate' }}</span>
             </div>
             <div class="refresh-action">
               <app-button variant="secondary" size="sm" (buttonClick)="refreshData()">
@@ -160,36 +160,16 @@
         </h2>
         
         <div class="status-grid">
-          <div class="status-item">
-            <div class="status-icon success">
-              <app-icon name="check_circle"></app-icon>
+          <div 
+            *ngFor="let status of systemStatus" 
+            class="status-item">
+            <div class="status-icon" [ngClass]="status.type">
+              <app-icon [name]="status.icon"></app-icon>
             </div>
             <div class="status-content">
-              <h4>API Backend</h4>
-              <p>Conectado y funcionando</p>
-              <span class="status-badge success">Operativo</span>
-            </div>
-          </div>
-          
-          <div class="status-item">
-            <div class="status-icon success">
-              <app-icon name="storage"></app-icon>
-            </div>
-            <div class="status-content">
-              <h4>Base de Datos</h4>
-              <p>Conexión estable</p>
-              <span class="status-badge success">Operativo</span>
-            </div>
-          </div>
-          
-          <div class="status-item">
-            <div class="status-icon warning">
-              <app-icon name="construction"></app-icon>
-            </div>
-            <div class="status-content">
-              <h4>Módulos Adicionales</h4>
-              <p>Mascotas, citas, inventario</p>
-              <span class="status-badge warning">En desarrollo</span>
+              <h4>{{ status.title }}</h4>
+              <p>{{ status.description }}</p>
+              <span class="status-badge" [ngClass]="status.type">{{ status.status }}</span>
             </div>
           </div>
         </div>

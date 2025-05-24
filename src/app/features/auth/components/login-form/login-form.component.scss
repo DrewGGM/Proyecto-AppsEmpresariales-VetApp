@@ -48,6 +48,11 @@
     flex-direction: column;
     gap: $spacing-lg;
     
+    app-button {
+      margin-top: $spacing-md;
+      align-self: stretch;
+    }
+    
     .form-options {
       display: flex;
       justify-content: space-between;

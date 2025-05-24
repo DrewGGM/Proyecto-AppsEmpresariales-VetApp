@@ -1,1 +1,272 @@
-<p>user-create-edit works!</p>
+<app-dashboard-layout>
+  <div class="user-create-edit-page">
+    <!-- Encabezado de página -->
+    <div class="page-header">
+      <div class="header-content">
+        <div class="title-section">
+          <h1>{{ pageTitle }}</h1>
+          <p>{{ isEditMode ? 'Modifica la información del usuario' : 'Completa la información para crear un nuevo usuario' }}</p>
+        </div>
+        <div class="header-actions">
+          <app-button variant="secondary" (buttonClick)="onCancel()" [disabled]="submitting">
+            <app-icon name="close"></app-icon>
+            <span>Cancelar</span>
+          </app-button>
+        </div>
+      </div>
+
+      <div class="breadcrumb">
+        <a routerLink="/dashboard">Inicio</a>
+        <app-icon name="chevron_right"></app-icon>
+        <a routerLink="/usuarios">Usuarios</a>
+        <app-icon name="chevron_right"></app-icon>
+        <span>{{ isEditMode ? 'Editar' : 'Crear' }}</span>
+      </div>
+    </div>
+
+    <!-- Estado de carga -->
+    <div *ngIf="loading" class="loading-section">
+      <app-spinner size="large"></app-spinner>
+      <p>Cargando datos del usuario...</p>
+    </div>
+
+    <!-- Formulario principal -->
+    <div class="form-section" *ngIf="!loading">
+      <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="user-form">
+        
+        <!-- Información personal -->
+        <div class="form-section-header">
+          <h2>
+            <app-icon name="person"></app-icon>
+            Información Personal
+          </h2>
+          <p>Datos básicos de identificación del usuario</p>
+        </div>
+
+        <div class="form-grid">
+          <!-- Nombre -->
+          <div class="form-field">
+            <label for="name" class="required">Nombre</label>
+            <input
+              id="name"
+              type="text"
+              formControlName="name"
+              placeholder="Ingresa el nombre"
+              class="form-input"
+              autocomplete="given-name"
+              [class.error]="name?.invalid && (name?.dirty || name?.touched)"
+              [class.success]="name?.valid && (name?.dirty || name?.touched)">
+            
+            <div class="field-feedback">
+              <div *ngIf="name?.invalid && (name?.dirty || name?.touched)" class="error-message">
+                <app-icon name="error"></app-icon>
+                <span>{{ getErrorMessage('name') }}</span>
+              </div>
+              <div *ngIf="name?.valid && (name?.dirty || name?.touched)" class="success-message">
+                <app-icon name="check_circle"></app-icon>
+                <span>Nombre válido</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Apellido -->
+          <div class="form-field">
+            <label for="lastName" class="required">Apellido</label>
+            <input
+              id="lastName"
+              type="text"
+              formControlName="lastName"
+              placeholder="Ingresa el apellido"
+              class="form-input"
+              autocomplete="family-name"
+              [class.error]="lastName?.invalid && (lastName?.dirty || lastName?.touched)"
+              [class.success]="lastName?.valid && (lastName?.dirty || lastName?.touched)">
+            
+            <div class="field-feedback">
+              <div *ngIf="lastName?.invalid && (lastName?.dirty || lastName?.touched)" class="error-message">
+                <app-icon name="error"></app-icon>
+                <span>{{ getErrorMessage('lastName') }}</span>
+              </div>
+              <div *ngIf="lastName?.valid && (lastName?.dirty || lastName?.touched)" class="success-message">
+                <app-icon name="check_circle"></app-icon>
+                <span>Apellido válido</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="form-field full-width">
+          <label for="email" class="required">Correo Electrónico</label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            placeholder="usuario@ejemplo.com"
+            class="form-input"
+            autocomplete="email"
+            [class.error]="email?.invalid && (email?.dirty || email?.touched)"
+            [class.success]="email?.valid && (email?.dirty || email?.touched)">
+          
+          <div class="field-feedback">
+            <div *ngIf="email?.invalid && (email?.dirty || email?.touched)" class="error-message">
+              <app-icon name="error"></app-icon>
+              <span>{{ getErrorMessage('email') }}</span>
+            </div>
+            <div *ngIf="email?.valid && (email?.dirty || email?.touched)" class="success-message">
+              <app-icon name="check_circle"></app-icon>
+              <span>Email válido</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Separador para seguridad -->
+        <div class="form-section-header">
+          <h2>
+            <app-icon name="security"></app-icon>
+            Información de Seguridad
+          </h2>
+          <p>{{ isEditMode ? 'Deja en blanco para mantener la contraseña actual' : 'Contraseña segura para el acceso al sistema' }}</p>
+        </div>
+
+        <div class="form-grid">
+          <!-- Contraseña -->
+          <div class="form-field">
+            <label for="password" [class.required]="!isEditMode">Contraseña {{ isEditMode ? '(Opcional)' : '' }}</label>
+            <input
+              id="password"
+              type="password"
+              formControlName="password"
+              placeholder="{{ isEditMode ? 'Nueva contraseña (opcional)' : 'Mínimo 8 caracteres' }}"
+              class="form-input"
+              autocomplete="new-password"
+              [class.error]="password?.invalid && (password?.dirty || password?.touched)"
+              [class.success]="password?.valid && password?.value && (password?.dirty || password?.touched)">
+            
+            <div class="field-feedback">
+              <div *ngIf="password?.invalid && (password?.dirty || password?.touched)" class="error-message">
+                <app-icon name="error"></app-icon>
+                <span>{{ getErrorMessage('password') }}</span>
+              </div>
+              <div *ngIf="password?.valid && password?.value && (password?.dirty || password?.touched)" class="success-message">
+                <app-icon name="check_circle"></app-icon>
+                <span>Contraseña segura</span>
+              </div>
+            </div>
+            
+            <small class="field-hint">
+              <app-icon name="info"></app-icon>
+              Debe contener mayúscula, minúscula, número y símbolo especial
+            </small>
+          </div>
+
+          <!-- Confirmar contraseña -->
+          <div class="form-field" *ngIf="!isEditMode || password?.value">
+            <label for="confirmPassword" [class.required]="!isEditMode || password?.value">
+              Confirmar Contraseña
+            </label>
+            <input
+              id="confirmPassword"
+              type="password"
+              formControlName="confirmPassword"
+              placeholder="Repite la contraseña"
+              class="form-input"
+              autocomplete="new-password"
+              [class.error]="confirmPassword?.invalid && (confirmPassword?.dirty || confirmPassword?.touched)"
+              [class.success]="confirmPassword?.valid && confirmPassword?.value && (confirmPassword?.dirty || confirmPassword?.touched)">
+            
+            <div class="field-feedback">
+              <div *ngIf="confirmPassword?.invalid && (confirmPassword?.dirty || confirmPassword?.touched)" class="error-message">
+                <app-icon name="error"></app-icon>
+                <span>{{ getErrorMessage('confirmPassword') }}</span>
+              </div>
+              <div *ngIf="confirmPassword?.valid && confirmPassword?.value && (confirmPassword?.dirty || confirmPassword?.touched)" class="success-message">
+                <app-icon name="check_circle"></app-icon>
+                <span>Las contraseñas coinciden</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rol y permisos -->
+        <div class="form-section-header">
+          <h2>
+            <app-icon name="admin_panel_settings"></app-icon>
+            Rol y Permisos
+          </h2>
+          <p>Define el nivel de acceso y permisos del usuario</p>
+        </div>
+
+        <!-- Selector de rol -->
+        <div class="form-field full-width">
+          <label for="role" class="required">Rol del Usuario</label>
+          <select
+            id="role"
+            formControlName="role"
+            class="form-select"
+            [class.error]="role?.invalid && (role?.dirty || role?.touched)"
+            [class.success]="role?.valid && (role?.dirty || role?.touched)">
+            <option value="">Selecciona un rol</option>
+            <option *ngFor="let roleOption of roles" [value]="roleOption.value">
+              {{ roleOption.label }}
+            </option>
+          </select>
+          
+          <div class="field-feedback">
+            <div *ngIf="role?.invalid && (role?.dirty || role?.touched)" class="error-message">
+              <app-icon name="error"></app-icon>
+              <span>{{ getErrorMessage('role') }}</span>
+            </div>
+            <div *ngIf="role?.valid && (role?.dirty || role?.touched)" class="success-message">
+              <app-icon name="check_circle"></app-icon>
+              <span>Rol seleccionado</span>
+            </div>
+          </div>
+
+          <!-- Descripción del rol seleccionado -->
+          <div class="role-description" *ngIf="role?.value">
+            <app-icon name="info"></app-icon>
+            <span>{{ selectedRoleDescription }}</span>
+          </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="form-actions">
+          <app-button 
+            type="button"
+            variant="secondary" 
+            (buttonClick)="onCancel()"
+            [disabled]="submitting">
+            <app-icon name="close"></app-icon>
+            <span>Cancelar</span>
+          </app-button>
+
+          <button 
+            type="submit"
+            class="submit-btn"
+            [disabled]="userForm.invalid || submitting">
+            <app-icon *ngIf="!submitting" [name]="isEditMode ? 'save' : 'add'"></app-icon>
+            <app-spinner *ngIf="submitting" size="small"></app-spinner>
+            <span>{{ submitButtonText }}</span>
+          </button>
+        </div>
+
+        <!-- Resumen de validación -->
+        <div class="validation-summary" *ngIf="userForm.invalid && userForm.touched">
+          <div class="summary-header">
+            <app-icon name="warning"></app-icon>
+            <span>Por favor, corrige los siguientes errores:</span>
+          </div>
+          <ul class="error-list">
+            <li *ngIf="name?.invalid && name?.touched">{{ getErrorMessage('name') }}</li>
+            <li *ngIf="lastName?.invalid && lastName?.touched">{{ getErrorMessage('lastName') }}</li>
+            <li *ngIf="email?.invalid && email?.touched">{{ getErrorMessage('email') }}</li>
+            <li *ngIf="password?.invalid && password?.touched">{{ getErrorMessage('password') }}</li>
+            <li *ngIf="confirmPassword?.invalid && confirmPassword?.touched">{{ getErrorMessage('confirmPassword') }}</li>
+            <li *ngIf="role?.invalid && role?.touched">{{ getErrorMessage('role') }}</li>
+          </ul>
+        </div>
+      </form>
+    </div>
+  </div>
+</app-dashboard-layout>

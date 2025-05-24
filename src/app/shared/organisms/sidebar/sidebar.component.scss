@@ -1,5 +1,17 @@
 @use '../../../../assets/styles/base/variables' as *;
 
+// Overlay móvil
+.mobile-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: $z-index-fixed - 1;
+  cursor: pointer;
+}
+
 .sidebar {
   position: fixed;
   top: 0;

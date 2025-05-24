@@ -1,13 +1,21 @@
-<aside class="sidebar" [class.collapsed]="isCollapsed">
+<!-- Overlay para móviles -->
+<div class="mobile-overlay" 
+     *ngIf="isMobile && isMobileOpen" 
+     (click)="closeMobileSidebar()">
+</div>
+
+<aside class="sidebar" 
+       [class.collapsed]="isCollapsed && !isMobile"
+       [class.mobile-open]="isMobile && isMobileOpen">
   <!-- Logo y header -->
   <div class="sidebar-header">
-    <div class="logo" routerLink="/dashboard">
+    <div class="logo" routerLink="/dashboard" (click)="closeMobileSidebar()">
       <app-icon name="pets" class="logo-icon"></app-icon>
-      <span class="logo-text" *ngIf="!isCollapsed">VetApp</span>
+      <span class="logo-text" *ngIf="!isCollapsed || isMobile">VetApp</span>
     </div>
     
     <button class="collapse-btn" (click)="toggleSidebar()" [attr.aria-label]="isCollapsed ? 'Expandir menú' : 'Contraer menú'">
-      <app-icon [name]="isCollapsed ? 'menu' : 'close'"></app-icon>
+      <app-icon [name]="(isMobile && isMobileOpen) ? 'close' : (isCollapsed ? 'menu' : 'close')"></app-icon>
     </button>
   </div>
 
@@ -16,7 +24,7 @@
     <div class="user-avatar">
       <app-avatar [name]="currentUser.name" [lastName]="currentUser.lastName" size="medium"></app-avatar>
     </div>
-    <div class="user-details" *ngIf="!isCollapsed">
+    <div class="user-details" *ngIf="!isCollapsed || isMobile">
       <div class="user-name">{{ currentUser.name }} {{ currentUser.lastName }}</div>
       <div class="user-role">{{ getUserRoleDisplay(currentUser.role) }}</div>
     </div>
@@ -27,60 +35,60 @@
     <ul class="nav-list">
       <!-- Dashboard -->
       <li class="nav-item">
-        <a routerLink="/dashboard" routerLinkActive="active" class="nav-link">
+        <a routerLink="/dashboard" routerLinkActive="active" class="nav-link" (click)="closeMobileSidebar()">
           <app-icon name="dashboard" class="nav-icon"></app-icon>
-          <span class="nav-text" *ngIf="!isCollapsed">Dashboard</span>
+          <span class="nav-text" *ngIf="!isCollapsed || isMobile">Dashboard</span>
         </a>
       </li>
 
       <!-- Clientes -->
       <li class="nav-item">
-        <a routerLink="/clientes" routerLinkActive="active" class="nav-link">
+        <a routerLink="/clientes" routerLinkActive="active" class="nav-link" (click)="closeMobileSidebar()">
           <app-icon name="people" class="nav-icon"></app-icon>
-          <span class="nav-text" *ngIf="!isCollapsed">Clientes</span>
+          <span class="nav-text" *ngIf="!isCollapsed || isMobile">Clientes</span>
         </a>
       </li>
 
       <!-- Mascotas -->
       <li class="nav-item">
-        <a routerLink="/mascotas" routerLinkActive="active" class="nav-link">
+        <a routerLink="/mascotas" routerLinkActive="active" class="nav-link" (click)="closeMobileSidebar()">
           <app-icon name="pets" class="nav-icon"></app-icon>
-          <span class="nav-text" *ngIf="!isCollapsed">Mascotas</span>
+          <span class="nav-text" *ngIf="!isCollapsed || isMobile">Mascotas</span>
         </a>
       </li>
 
       <!-- Citas -->
       <li class="nav-item">
-        <a routerLink="/citas" routerLinkActive="active" class="nav-link">
+        <a routerLink="/citas" routerLinkActive="active" class="nav-link" (click)="closeMobileSidebar()">
           <app-icon name="event" class="nav-icon"></app-icon>
-          <span class="nav-text" *ngIf="!isCollapsed">Citas</span>
+          <span class="nav-text" *ngIf="!isCollapsed || isMobile">Citas</span>
         </a>
       </li>
 
       <!-- Consultas -->
       <li class="nav-item">
-        <a routerLink="/consultas" routerLinkActive="active" class="nav-link">
+        <a routerLink="/consultas" routerLinkActive="active" class="nav-link" (click)="closeMobileSidebar()">
           <app-icon name="medical_services" class="nav-icon"></app-icon>
-          <span class="nav-text" *ngIf="!isCollapsed">Consultas</span>
+          <span class="nav-text" *ngIf="!isCollapsed || isMobile">Consultas</span>
         </a>
       </li>
 
       <!-- Usuarios (solo para admins) -->
       <li class="nav-item" *ngIf="canAccessUsers()">
-        <a routerLink="/usuarios" routerLinkActive="active" class="nav-link">
+        <a routerLink="/usuarios" routerLinkActive="active" class="nav-link" (click)="closeMobileSidebar()">
           <app-icon name="group" class="nav-icon"></app-icon>
-          <span class="nav-text" *ngIf="!isCollapsed">Usuarios</span>
+          <span class="nav-text" *ngIf="!isCollapsed || isMobile">Usuarios</span>
         </a>
       </li>
 
       <!-- Divider -->
-      <li class="nav-divider" *ngIf="!isCollapsed"></li>
+      <li class="nav-divider" *ngIf="!isCollapsed || isMobile"></li>
 
       <!-- Configuración -->
       <li class="nav-item">
-        <a routerLink="/configuracion" routerLinkActive="active" class="nav-link">
+        <a routerLink="/configuracion" routerLinkActive="active" class="nav-link" (click)="closeMobileSidebar()">
           <app-icon name="settings" class="nav-icon"></app-icon>
-          <span class="nav-text" *ngIf="!isCollapsed">Configuración</span>
+          <span class="nav-text" *ngIf="!isCollapsed || isMobile">Configuración</span>
         </a>
       </li>
     </ul>
@@ -90,7 +98,7 @@
   <div class="sidebar-footer">
     <button class="logout-btn" (click)="logout()" [attr.aria-label]="'Cerrar sesión'">
       <app-icon name="logout" class="nav-icon"></app-icon>
-      <span class="nav-text" *ngIf="!isCollapsed">Cerrar Sesión</span>
+      <span class="nav-text" *ngIf="!isCollapsed || isMobile">Cerrar Sesión</span>
     </button>
   </div>
 </aside>

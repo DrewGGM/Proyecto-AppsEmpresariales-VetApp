@@ -2,8 +2,8 @@
 
 .user-detail-page {
   padding: $spacing-lg;
-  max-width: 1200px;
-  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
   
   .page-header {
     margin-bottom: $spacing-xl;
@@ -49,12 +49,6 @@
           font-size: $font-size-2xl;
           margin: 0;
         }
-      }
-      
-      .header-actions {
-        display: flex;
-        align-items: center;
-        gap: $spacing-md;
       }
     }
     
@@ -557,11 +551,6 @@
         flex-direction: column;
         align-items: flex-start;
         gap: $spacing-md;
-        
-        .header-actions {
-          width: 100%;
-          justify-content: space-between;
-        }
       }
     }
     

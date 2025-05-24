@@ -4,6 +4,64 @@
   display: flex;
   min-height: 100vh;
   background-color: $neutral-bg;
+  position: relative;
+
+  // Debug info temporal
+  .debug-info {
+    position: fixed;
+    top: $spacing-xs;
+    right: $spacing-xs;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: $spacing-xs;
+    border-radius: $border-radius-sm;
+    font-size: 10px;
+    z-index: 9999;
+    
+    @media (min-width: 769px) {
+      display: none; // Solo mostrar en móviles
+    }
+  }
+
+  // Botón flotante para móviles
+  .mobile-menu-btn {
+    position: fixed;
+    top: $spacing-md;
+    left: $spacing-md;
+    width: 48px;
+    height: 48px;
+    background: $primary;
+    border: none;
+    border-radius: $border-radius-circle;
+    color: $neutral-light;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: $shadow-lg;
+    z-index: $z-index-fixed + 1;
+    transition: all $transition-default;
+
+    &:hover {
+      background: $primary-dark;
+      transform: scale(1.05);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    app-icon {
+      font-size: 24px;
+    }
+
+    // Solo mostrar en móviles
+    display: none;
+    
+    @media (max-width: $breakpoint-md) {
+      display: flex;
+    }
+  }
 
   .main-content {
     flex: 1;
@@ -12,9 +70,14 @@
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    width: calc(100% - #{$sidebar-width});
+    max-width: calc(100% - #{$sidebar-width});
+    overflow-x: hidden;
 
     &.sidebar-collapsed {
       margin-left: $sidebar-collapsed-width;
+      width: calc(100% - #{$sidebar-collapsed-width});
+      max-width: calc(100% - #{$sidebar-collapsed-width});
     }
 
     .content-header {
@@ -29,7 +92,10 @@
       flex: 1;
       padding: $spacing-lg;
       overflow-y: auto;
+      overflow-x: hidden;
       background-color: $neutral-bg;
+      width: 100%;
+      box-sizing: border-box;
     }
   }
 }
@@ -39,9 +105,13 @@
   .dashboard-layout {
     .main-content {
       margin-left: 0;
+      width: 100%;
+      max-width: 100%;
 
       &.sidebar-collapsed {
         margin-left: 0;
+        width: 100%;
+        max-width: 100%;
       }
     }
   }

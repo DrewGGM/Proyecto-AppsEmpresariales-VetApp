@@ -2,6 +2,8 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes, PreloadAllModules } from '@angular/router';
 import { AuthGuard } from './core/auth/guards/auth.guard';
 import { RoleGuard } from './core/auth/guards/role.guard';
+import { InitialRedirectGuard } from './core/auth/guards/initial-redirect.guard';
+import { NonAuthGuard } from './core/auth/guards/non-auth.guard';
 import { UnderDevelopmentComponent } from './shared/pages/under-development/under-development.component';
 
 const routes: Routes = [
@@ -14,7 +16,8 @@ const routes: Routes = [
   // Rutas de autenticación (solo para usuarios no logueados)
   {
     path: 'auth',
-    loadChildren: () => import('./features/auth/auth.module').then(m => m.AuthModule)
+    loadChildren: () => import('./features/auth/auth.module').then(m => m.AuthModule),
+    canActivate: [NonAuthGuard]
   },
   
   // Dashboard principal (área protegida por defecto después del login)
@@ -103,17 +106,17 @@ const routes: Routes = [
     }
   },
   
-  // Ruta por defecto - redirige al dashboard si está autenticado, sino al login
+  // Ruta por defecto - redirige al dashboard si está autenticado, sino al home
   {
     path: '',
-    redirectTo: '/dashboard',
-    pathMatch: 'full'
+    canActivate: [InitialRedirectGuard],
+    children: []
   },
   
-  // Ruta wildcard - redirige al dashboard si está autenticado, sino al login
+  // Ruta wildcard - redirige al home para rutas no encontradas
   {
     path: '**',
-    redirectTo: '/dashboard'
+    redirectTo: '/home'
   }
 ];
 

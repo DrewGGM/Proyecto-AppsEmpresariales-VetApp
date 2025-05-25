@@ -60,10 +60,7 @@ export class AuthService {
           error: null
         });
         
-        // Redirigir al dashboard si estamos en la página de login
-        if (this.router.url === '/auth/login' || this.router.url === '/') {
-          this.router.navigate(['/dashboard']);
-        }
+        // No hacer redirecciones automáticas aquí - dejar que los guards manejen la lógica
       }
     } catch (error) {
       console.error('Error al cargar sesión desde localStorage:', error);
@@ -136,7 +133,7 @@ export class AuthService {
       loading: false,
       error: null
     });
-    this.router.navigate(['/auth/login']);
+    this.router.navigate(['/home']);
     
     if (showNotification) {
       this.toastService.success('Sesión cerrada correctamente');

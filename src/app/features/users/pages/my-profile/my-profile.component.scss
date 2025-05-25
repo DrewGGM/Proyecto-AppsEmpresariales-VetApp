@@ -1,0 +1,793 @@
+@use 'variables' as *;
+
+.my-profile-page {
+  padding: $spacing-lg;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  // Encabezado de página
+  .page-header {
+    margin-bottom: $spacing-xl;
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: $spacing-md;
+
+      .title-section {
+        h1 {
+          font-size: $font-size-3xl;
+          font-weight: $font-weight-bold;
+          color: $neutral-dark;
+          margin: 0 0 $spacing-xs 0;
+        }
+
+        p {
+          color: $neutral-medium;
+          font-size: $font-size-lg;
+          margin: 0;
+        }
+      }
+    }
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+      font-size: $font-size-sm;
+      color: $neutral-medium;
+
+      a {
+        color: $primary;
+        text-decoration: none;
+        
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+
+      app-icon {
+        font-size: 16px;
+        color: $neutral-medium;
+      }
+    }
+  }
+
+  // Estado de carga
+  .loading-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: $spacing-3xl;
+    text-align: center;
+
+    p {
+      margin-top: $spacing-lg;
+      color: $neutral-medium;
+      font-size: $font-size-lg;
+    }
+  }
+
+  // Contenido principal
+  .profile-content {
+    display: grid;
+    gap: $spacing-xl;
+    grid-template-columns: 1fr;
+
+    @media (min-width: $breakpoint-lg) {
+      grid-template-columns: 2fr 1fr;
+      
+      .profile-main-card {
+        grid-column: 1 / -1;
+      }
+      
+      .password-change-card {
+        grid-column: 1 / -1;
+      }
+    }
+  }
+
+  // Tarjeta principal de perfil
+  .profile-main-card {
+    background: $neutral-light;
+    border-radius: $border-radius-lg;
+    box-shadow: $shadow-md;
+    overflow: hidden;
+
+    .profile-header {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-lg;
+      padding: $spacing-xl;
+      background: linear-gradient(135deg, $primary-light 0%, $primary 100%);
+      color: white;
+
+      @media (min-width: $breakpoint-md) {
+        flex-direction: row;
+        align-items: center;
+      }
+
+      .avatar-section {
+        display: flex;
+        justify-content: center;
+
+        @media (min-width: $breakpoint-md) {
+          justify-content: flex-start;
+        }
+
+        .avatar-container {
+          position: relative;
+
+          .photo-upload-overlay {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            
+            .upload-btn {
+              width: 40px;
+              height: 40px;
+              border-radius: 50%;
+              background: $secondary;
+              border: 3px solid white;
+              color: white;
+              cursor: pointer;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              transition: all 0.3s ease;
+              
+              &:hover:not(:disabled) {
+                background: $secondary-dark;
+                transform: scale(1.1);
+              }
+              
+              &:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+              }
+
+              app-icon {
+                font-size: 20px;
+              }
+            }
+          }
+        }
+      }
+
+      .user-info {
+        flex: 1;
+        text-align: center;
+
+        @media (min-width: $breakpoint-md) {
+          text-align: left;
+        }
+
+        .user-name {
+          font-size: $font-size-2xl;
+          font-weight: $font-weight-bold;
+          margin: 0 0 $spacing-sm 0;
+        }
+
+        .user-role {
+          margin-bottom: $spacing-sm;
+        }
+
+        .user-status {
+          margin-bottom: $spacing-md;
+        }
+      }
+
+      .profile-actions {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-sm;
+        align-items: stretch;
+
+        @media (min-width: $breakpoint-sm) {
+          flex-direction: row;
+          align-items: center;
+        }
+
+        @media (min-width: $breakpoint-md) {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        app-button {
+          width: 100%;
+          
+          @media (min-width: $breakpoint-sm) {
+            width: auto;
+            min-width: 150px;
+          }
+
+          @media (min-width: $breakpoint-md) {
+            width: 100%;
+          }
+
+          // Estilos específicos para botones en el header del perfil
+          ::ng-deep {
+            // Botón primario (Editar Perfil)
+            .btn-primary {
+              background-color: white !important;
+              border-color: white !important;
+              color: $primary !important;
+              font-weight: $font-weight-bold;
+              
+              &:hover {
+                background-color: rgba(white, 0.9) !important;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+              }
+            }
+            
+            // Botón terciario (Cambiar Contraseña)
+            .btn-tertiary {
+              background-color: rgba(white, 0.15) !important;
+              border: 2px solid rgba(white, 0.6) !important;
+              color: white !important;
+              font-weight: $font-weight-medium;
+              backdrop-filter: blur(10px);
+              
+              &:hover {
+                background-color: rgba(white, 0.25) !important;
+                border-color: white !important;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .contact-info {
+      padding: $spacing-xl;
+
+      .info-item {
+        display: flex;
+        align-items: center;
+        gap: $spacing-md;
+        padding: $spacing-md 0;
+        border-bottom: 1px solid rgba($neutral-medium, 0.2);
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        app-icon {
+          color: $primary;
+          font-size: 20px;
+          min-width: 20px;
+        }
+
+        .label {
+          font-weight: $font-weight-medium;
+          color: $neutral-medium;
+          min-width: 120px;
+        }
+
+        .value {
+          color: $neutral-dark;
+          font-weight: $font-weight-medium;
+        }
+      }
+    }
+
+    .profile-edit-form {
+      padding: $spacing-xl;
+      border-top: 1px solid rgba($neutral-medium, 0.2);
+
+      .form-grid {
+        display: grid;
+        gap: $spacing-lg;
+        grid-template-columns: 1fr;
+        margin-bottom: $spacing-xl;
+
+        @media (min-width: $breakpoint-md) {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .full-width {
+          grid-column: 1 / -1;
+        }
+      }
+
+      .form-field {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-sm;
+
+        label {
+          font-weight: $font-weight-medium;
+          color: $neutral-dark;
+          font-size: $font-size-sm;
+
+          &.required::after {
+            content: ' *';
+            color: $error;
+          }
+        }
+
+        .form-input {
+          padding: $spacing-md;
+          border: 2px solid rgba($neutral-medium, 0.3);
+          border-radius: $border-radius-md;
+          font-size: $font-size-base;
+          transition: all 0.3s ease;
+
+          &:focus {
+            outline: none;
+            border-color: $primary;
+            box-shadow: 0 0 0 3px rgba($primary, 0.1);
+          }
+
+          &.error {
+            border-color: $error;
+            
+            &:focus {
+              box-shadow: 0 0 0 3px rgba($error, 0.1);
+            }
+          }
+
+          &.success {
+            border-color: $success;
+            
+            &:focus {
+              box-shadow: 0 0 0 3px rgba($success, 0.1);
+            }
+          }
+        }
+
+        .field-feedback {
+          display: flex;
+          align-items: center;
+          gap: $spacing-xs;
+          font-size: $font-size-sm;
+          color: $error;
+
+          app-icon {
+            font-size: 16px;
+          }
+        }
+      }
+
+      .form-actions {
+        display: flex;
+        gap: $spacing-md;
+        justify-content: flex-end;
+
+        .submit-btn {
+          display: flex;
+          align-items: center;
+          gap: $spacing-sm;
+          padding: $spacing-md $spacing-lg;
+          background: $primary;
+          color: white;
+          border: none;
+          border-radius: $border-radius-md;
+          font-weight: $font-weight-medium;
+          cursor: pointer;
+          transition: all 0.3s ease;
+
+          &:hover:not(:disabled) {
+            background: $primary-dark;
+            transform: translateY(-2px);
+            box-shadow: $shadow-lg;
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+          }
+
+          app-icon {
+            font-size: 18px;
+          }
+        }
+      }
+    }
+  }
+
+  // Tarjeta de cambio de contraseña
+  .password-change-card {
+    background: $neutral-light;
+    border-radius: $border-radius-lg;
+    box-shadow: $shadow-md;
+    overflow: hidden;
+
+    .card-header {
+      padding: $spacing-xl;
+      background: linear-gradient(135deg, $secondary-light 0%, $secondary 100%);
+      color: white;
+
+      h3 {
+        display: flex;
+        align-items: center;
+        gap: $spacing-md;
+        font-size: $font-size-xl;
+        font-weight: $font-weight-bold;
+        margin: 0 0 $spacing-sm 0;
+
+        app-icon {
+          font-size: 24px;
+        }
+      }
+
+      p {
+        margin: 0;
+        opacity: 0.9;
+      }
+    }
+
+    form {
+      padding: $spacing-xl;
+
+      .form-grid {
+        display: grid;
+        gap: $spacing-lg;
+        grid-template-columns: 1fr;
+        margin-bottom: $spacing-xl;
+
+        @media (min-width: $breakpoint-md) {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .full-width {
+          grid-column: 1 / -1;
+        }
+      }
+
+      .form-field {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-sm;
+
+        label {
+          font-weight: $font-weight-medium;
+          color: $neutral-dark;
+          font-size: $font-size-sm;
+
+          &.required::after {
+            content: ' *';
+            color: $error;
+          }
+        }
+
+        .form-input {
+          padding: $spacing-md;
+          border: 2px solid rgba($neutral-medium, 0.3);
+          border-radius: $border-radius-md;
+          font-size: $font-size-base;
+          transition: all 0.3s ease;
+
+          &:focus {
+            outline: none;
+            border-color: $secondary;
+            box-shadow: 0 0 0 3px rgba($secondary, 0.1);
+          }
+
+          &.error {
+            border-color: $error;
+            
+            &:focus {
+              box-shadow: 0 0 0 3px rgba($error, 0.1);
+            }
+          }
+
+          &.success {
+            border-color: $success;
+            
+            &:focus {
+              box-shadow: 0 0 0 3px rgba($success, 0.1);
+            }
+          }
+        }
+
+        .field-feedback {
+          display: flex;
+          align-items: center;
+          gap: $spacing-xs;
+          font-size: $font-size-sm;
+          color: $error;
+
+          app-icon {
+            font-size: 16px;
+          }
+        }
+      }
+
+      .form-actions {
+        display: flex;
+        gap: $spacing-md;
+        justify-content: flex-end;
+
+        .submit-btn {
+          display: flex;
+          align-items: center;
+          gap: $spacing-sm;
+          padding: $spacing-md $spacing-lg;
+          background: $secondary;
+          color: white;
+          border: none;
+          border-radius: $border-radius-md;
+          font-weight: $font-weight-medium;
+          cursor: pointer;
+          transition: all 0.3s ease;
+
+          &:hover:not(:disabled) {
+            background: $secondary-dark;
+            transform: translateY(-2px);
+            box-shadow: $shadow-lg;
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+          }
+
+          app-icon {
+            font-size: 18px;
+          }
+        }
+      }
+    }
+  }
+
+  // Tarjeta de estadísticas
+  .stats-card {
+    background: $neutral-light;
+    border-radius: $border-radius-lg;
+    box-shadow: $shadow-md;
+    overflow: hidden;
+
+    .card-header {
+      padding: $spacing-xl;
+      background: linear-gradient(135deg, $accent 0%, $warning 100%);
+      color: white;
+
+      h3 {
+        display: flex;
+        align-items: center;
+        gap: $spacing-md;
+        font-size: $font-size-xl;
+        font-weight: $font-weight-bold;
+        margin: 0 0 $spacing-sm 0;
+
+        app-icon {
+          font-size: 24px;
+        }
+      }
+
+      p {
+        margin: 0;
+        opacity: 0.9;
+      }
+    }
+
+    .stats-grid {
+      padding: $spacing-xl;
+      display: grid;
+      gap: $spacing-lg;
+      grid-template-columns: 1fr;
+
+      @media (min-width: $breakpoint-sm) {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .stat-item {
+        display: flex;
+        align-items: center;
+        gap: $spacing-md;
+        padding: $spacing-lg;
+        background: rgba($neutral-medium, 0.1);
+        border-radius: $border-radius-md;
+        transition: all 0.3s ease;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: $shadow-md;
+        }
+
+        .stat-icon {
+          width: 48px;
+          height: 48px;
+          border-radius: 50%;
+          background: $accent;
+          color: white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          app-icon {
+            font-size: 24px;
+          }
+        }
+
+        .stat-content {
+          flex: 1;
+
+          .stat-value {
+            font-size: $font-size-2xl;
+            font-weight: $font-weight-bold;
+            color: $neutral-dark;
+            margin-bottom: $spacing-xs;
+          }
+
+          .stat-label {
+            font-size: $font-size-sm;
+            color: $neutral-medium;
+            font-weight: $font-weight-medium;
+          }
+        }
+      }
+    }
+  }
+
+  // Tarjeta de actividad
+  .activity-card {
+    background: $neutral-light;
+    border-radius: $border-radius-lg;
+    box-shadow: $shadow-md;
+    overflow: hidden;
+
+    .card-header {
+      padding: $spacing-xl;
+      background: linear-gradient(135deg, $info 0%, $primary 100%);
+      color: white;
+
+      h3 {
+        display: flex;
+        align-items: center;
+        gap: $spacing-md;
+        font-size: $font-size-xl;
+        font-weight: $font-weight-bold;
+        margin: 0 0 $spacing-sm 0;
+
+        app-icon {
+          font-size: 24px;
+        }
+      }
+
+      p {
+        margin: 0;
+        opacity: 0.9;
+      }
+    }
+
+    .activity-content {
+      padding: $spacing-xl;
+
+      .activity-item {
+        display: flex;
+        align-items: flex-start;
+        gap: $spacing-md;
+        padding: $spacing-md 0;
+        border-bottom: 1px solid rgba($neutral-medium, 0.2);
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        .activity-icon {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          flex-shrink: 0;
+
+          &.activity-primary { background: $primary; }
+          &.activity-secondary { background: $secondary; }
+          &.activity-success { background: $success; }
+          &.activity-warning { background: $warning; }
+          &.activity-info { background: $info; }
+          &.activity-accent { background: $accent; }
+
+          app-icon {
+            font-size: 20px;
+          }
+        }
+
+        .activity-details {
+          flex: 1;
+
+          .activity-title {
+            font-weight: $font-weight-medium;
+            color: $neutral-dark;
+            margin-bottom: $spacing-xs;
+          }
+
+          .activity-description {
+            font-size: $font-size-sm;
+            color: $neutral-medium;
+            margin-bottom: $spacing-xs;
+          }
+
+          .activity-time {
+            font-size: $font-size-xs;
+            color: $neutral-medium;
+            font-weight: $font-weight-medium;
+          }
+        }
+      }
+    }
+
+    .no-activity {
+      padding: $spacing-3xl;
+      text-align: center;
+      color: $neutral-medium;
+
+      app-icon {
+        font-size: 48px;
+        margin-bottom: $spacing-md;
+        opacity: 0.5;
+      }
+
+      p {
+        margin: 0;
+        font-size: $font-size-lg;
+      }
+    }
+  }
+
+  // Estado de error
+  .error-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: $spacing-3xl;
+    text-align: center;
+
+    app-icon {
+      font-size: 64px;
+      color: $error;
+      margin-bottom: $spacing-lg;
+    }
+
+    h3 {
+      font-size: $font-size-xl;
+      color: $neutral-dark;
+      margin: 0 0 $spacing-md 0;
+    }
+
+    p {
+      color: $neutral-medium;
+      margin: 0 0 $spacing-xl 0;
+      max-width: 400px;
+    }
+  }
+
+  // Responsive adjustments
+  @media (max-width: $breakpoint-sm) {
+    padding: $spacing-md;
+
+    .profile-main-card .profile-header {
+      padding: $spacing-lg;
+    }
+
+    .password-change-card .card-header,
+    .stats-card .card-header,
+    .activity-card .card-header {
+      padding: $spacing-lg;
+    }
+
+    .password-change-card form,
+    .stats-card .stats-grid,
+    .activity-card .activity-content {
+      padding: $spacing-lg;
+    }
+
+    .profile-main-card .contact-info,
+    .profile-main-card .profile-edit-form {
+      padding: $spacing-lg;
+    }
+  }
+} 

@@ -4,6 +4,7 @@
 .auth-layout {
   position: relative;
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -14,6 +15,7 @@
   
   // Versión alternativa más colorida basada en los círculos del diseño
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-sizing: border-box;
 }
 
 .auth-background {
@@ -23,6 +25,7 @@
   width: 100%;
   height: 100%;
   z-index: 1;
+  pointer-events: none;
   
   .bg-circle {
     position: absolute;
@@ -81,6 +84,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  margin: auto;
+  box-sizing: border-box;
 }
 
 // Animaciones flotantes para los círculos
@@ -103,6 +108,14 @@
 @media (max-width: $breakpoint-md) {
   .auth-layout {
     padding: $spacing-md;
+    align-items: flex-start;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .auth-content {
+    padding: $spacing-md;
+    margin: $spacing-xl auto;
   }
   
   .auth-background {
@@ -132,13 +145,18 @@
       }
     }
   }
-  
-  .auth-content {
-    padding: $spacing-md;
-  }
 }
 
 @media (max-width: $breakpoint-sm) {
+  .auth-layout {
+    padding: $spacing-sm;
+  }
+  
+  .auth-content {
+    padding: $spacing-sm;
+    margin: $spacing-lg auto;
+  }
+  
   .auth-background {
     .bg-circle {
       &.bg-circle-1 {

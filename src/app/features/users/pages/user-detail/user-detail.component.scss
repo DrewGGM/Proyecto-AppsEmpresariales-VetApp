@@ -242,9 +242,9 @@
     }
   }
   
-  // Permisos
-  .permissions-section {
-    .permissions-card {
+  // Capacidades y accesos
+  .capabilities-section {
+    .capabilities-card {
       background-color: $neutral-light;
       border-radius: $border-radius-lg;
       box-shadow: $shadow-md;
@@ -271,237 +271,188 @@
         }
       }
       
-      .permissions-content {
+      .capabilities-content {
         padding: $spacing-md;
         
-        .permission-item {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
-          padding: $spacing-sm 0;
-          border-bottom: 1px solid rgba($neutral-medium, 0.1);
+        .role-info {
+          margin-bottom: $spacing-lg;
+          padding: $spacing-md;
+          background-color: rgba($primary, 0.05);
+          border-radius: $border-radius-md;
+          border-left: 4px solid $primary;
           
-          &:last-child {
-            border-bottom: none;
-          }
-          
-          .permission-info {
-            flex: 1;
-            
-            .permission-label {
-              display: flex;
-              align-items: center;
-              cursor: pointer;
-              
-              input[type="checkbox"] {
-                margin-right: $spacing-sm;
-                accent-color: $primary;
-              }
-              
-              .permission-name {
-                font-weight: $font-weight-medium;
-                color: $neutral-dark;
-              }
-            }
-            
-            .permission-description {
-              font-size: $font-size-xs;
-              color: $neutral-medium;
-              margin-top: $spacing-xxs;
-              margin-left: 24px; // Alineado con el texto del checkbox
-            }
-          }
-          
-          .permission-status {
-            font-size: $font-size-xs;
-            font-weight: $font-weight-medium;
-            padding: $spacing-xxs $spacing-xs;
-            border-radius: $border-radius-sm;
-            
-            &.granted {
-              background-color: rgba($success, 0.1);
-              color: $success;
-            }
-            
-            &.restricted {
-              background-color: rgba($warning, 0.1);
-              color: darken($warning, 15%);
-            }
-          }
-        }
-        
-        .no-permissions {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: $spacing-lg;
-          color: $neutral-medium;
-          
-          app-icon {
-            margin-right: $spacing-sm;
-            font-size: 20px;
-          }
-        }
-      }
-      
-      .loading-permissions {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: $spacing-xl;
-        color: $neutral-medium;
-        
-        app-spinner {
-          margin-right: $spacing-sm;
-        }
-      }
-      
-      .permissions-actions {
-        padding: $spacing-md;
-        display: flex;
-        justify-content: center;
-        border-top: 1px solid rgba($neutral-medium, 0.2);
-      }
-    }
-  }
-  
-  // Actividad
-  .activity-section {
-    .activity-card {
-      background-color: $neutral-light;
-      border-radius: $border-radius-lg;
-      box-shadow: $shadow-md;
-      overflow: hidden;
-      
-      .card-header {
-        display: flex;
-        align-items: center;
-        padding: $spacing-md;
-        background-color: $neutral-bg;
-        border-bottom: 1px solid rgba($neutral-medium, 0.2);
-        
-        app-icon {
-          color: $tertiary;
-          font-size: 24px;
-          margin-right: $spacing-sm;
-        }
-        
-        h3 {
-          margin: 0;
-          font-size: $font-size-lg;
-          font-weight: $font-weight-medium;
-          color: $neutral-dark;
-        }
-      }
-      
-      .activity-content {
-        padding: $spacing-md;
-        
-        .activity-item {
-          display: flex;
-          margin-bottom: $spacing-md;
-          
-          &:last-child {
-            margin-bottom: 0;
-          }
-          
-          .activity-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: $border-radius-circle;
+          .role-badge {
             display: flex;
             align-items: center;
-            justify-content: center;
-            margin-right: $spacing-md;
-            flex-shrink: 0;
+            margin-bottom: $spacing-sm;
             
             app-icon {
-              color: $neutral-light;
+              color: $primary;
               font-size: 20px;
+              margin-right: $spacing-sm;
             }
             
-            &.activity-consultation {
-              background-color: $tertiary;
-            }
-            
-            &.activity-vaccination {
-              background-color: $success;
-            }
-            
-            &.activity-login {
-              background-color: $primary;
+            span {
+              font-size: $font-size-lg;
+              font-weight: $font-weight-bold;
+              color: $primary;
             }
           }
           
-          .activity-details {
-            .activity-title {
+          .role-description {
+            margin: 0;
+            color: $neutral-dark;
+            font-size: $font-size-sm;
+            line-height: 1.5;
+          }
+        }
+        
+        .capabilities-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: $spacing-md;
+          margin-bottom: $spacing-lg;
+          
+          .capability-category {
+            background-color: $neutral-bg;
+            border-radius: $border-radius-md;
+            padding: $spacing-md;
+            border: 1px solid rgba($neutral-medium, 0.1);
+            
+            .category-title {
+              display: flex;
+              align-items: center;
+              margin: 0 0 $spacing-sm 0;
+              font-size: $font-size-md;
               font-weight: $font-weight-medium;
               color: $neutral-dark;
-              margin-bottom: $spacing-xxs;
+              
+              app-icon {
+                color: $secondary;
+                font-size: 18px;
+                margin-right: $spacing-sm;
+              }
             }
             
-            .activity-info {
+            .capability-list {
+              list-style: none;
+              padding: 0;
+              margin: 0;
+              
+              .capability-item {
+                display: flex;
+                align-items: center;
+                padding: $spacing-xs 0;
+                font-size: $font-size-sm;
+                color: $neutral-dark;
+                
+                .capability-icon {
+                  color: $success;
+                  font-size: 16px;
+                  margin-right: $spacing-sm;
+                  flex-shrink: 0;
+                }
+              }
+            }
+          }
+        }
+        
+        .access-restrictions {
+          margin-bottom: $spacing-lg;
+          padding: $spacing-md;
+          background-color: rgba($warning, 0.05);
+          border-radius: $border-radius-md;
+          border-left: 4px solid $warning;
+          
+          .restrictions-title {
+            display: flex;
+            align-items: center;
+            margin: 0 0 $spacing-sm 0;
+            font-size: $font-size-md;
+            font-weight: $font-weight-medium;
+            color: darken($warning, 15%);
+            
+            app-icon {
+              color: $warning;
+              font-size: 18px;
+              margin-right: $spacing-sm;
+            }
+          }
+          
+          .restrictions-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            
+            .restriction-item {
+              display: flex;
+              align-items: center;
+              padding: $spacing-xs 0;
               font-size: $font-size-sm;
-              color: $neutral-medium;
-              margin-bottom: $spacing-xxs;
+              color: darken($warning, 20%);
+              
+              .restriction-icon {
+                color: $warning;
+                font-size: 16px;
+                margin-right: $spacing-sm;
+                flex-shrink: 0;
+              }
             }
+          }
+        }
+        
+        .system-access {
+          padding: $spacing-md;
+          background-color: rgba($neutral-medium, 0.05);
+          border-radius: $border-radius-md;
+          border: 1px solid rgba($neutral-medium, 0.1);
+          
+          .access-title {
+            display: flex;
+            align-items: center;
+            margin: 0 0 $spacing-md 0;
+            font-size: $font-size-md;
+            font-weight: $font-weight-medium;
+            color: $neutral-dark;
             
-            .activity-time {
-              font-size: $font-size-xs;
+            app-icon {
               color: $neutral-medium;
+              font-size: 18px;
+              margin-right: $spacing-sm;
             }
           }
-        }
-        
-        .no-activities {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: $spacing-lg;
-          color: $neutral-medium;
           
-          app-icon {
-            margin-right: $spacing-sm;
-            font-size: 20px;
-          }
-        }
-      }
-      
-      .loading-activities {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: $spacing-xl;
-        color: $neutral-medium;
-        
-        app-spinner {
-          margin-right: $spacing-sm;
-        }
-      }
-      
-      .activity-footer {
-        padding: $spacing-md;
-        display: flex;
-        justify-content: flex-end;
-        border-top: 1px solid rgba($neutral-medium, 0.1);
-        
-        .view-all-link {
-          display: flex;
-          align-items: center;
-          background: none;
-          border: none;
-          color: $primary;
-          text-decoration: none;
-          font-size: $font-size-sm;
-          cursor: pointer;
-          
-          app-icon {
-            margin-left: $spacing-xxs;
-            font-size: 18px;
-          }
-          
-          &:hover {
-            text-decoration: underline;
+          .access-info {
+            .access-item {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              padding: $spacing-sm 0;
+              border-bottom: 1px solid rgba($neutral-medium, 0.1);
+              
+              &:last-child {
+                border-bottom: none;
+              }
+              
+              .access-label {
+                font-size: $font-size-sm;
+                color: $neutral-medium;
+                font-weight: $font-weight-medium;
+              }
+              
+              .access-value {
+                font-size: $font-size-sm;
+                font-weight: $font-weight-medium;
+                
+                &.active, &.yes {
+                  color: $success;
+                }
+                
+                &.inactive, &.no {
+                  color: $error;
+                }
+              }
+            }
           }
         }
       }

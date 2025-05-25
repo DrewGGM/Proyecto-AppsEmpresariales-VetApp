@@ -1,82 +1,53 @@
 <app-dashboard-layout>
   <div class="under-development-page">
-    <div class="development-container">
-      <div class="development-icon">
-        <app-icon name="construction"></app-icon>
+    <div class="content-container">
+      <!-- Icono principal -->
+      <div class="icon-container">
+        <app-icon name="construction" class="main-icon"></app-icon>
       </div>
       
-      <div class="development-content">
+      <!-- Título y mensaje -->
+      <div class="message-container">
         <h1>{{ featureName }} está en desarrollo</h1>
-        <p class="development-description">
+        <p class="description">
           Estamos trabajando arduamente para traerte esta funcionalidad. 
-          Será implementada en futuras versiones de VetApp.
+          Pronto estará disponible con todas las características que necesitas.
         </p>
         
-        <div class="development-features">
-          <h3>¿Qué puedes hacer mientras tanto?</h3>
-          <ul class="feature-list">
-            <li>
-              <app-icon name="people"></app-icon>
-              <span>Gestionar usuarios del sistema</span>
-            </li>
-            <li>
-              <app-icon name="dashboard"></app-icon>
-              <span>Revisar el dashboard principal</span>
-            </li>
-            <li>
-              <app-icon name="settings"></app-icon>
-              <span>Configurar tu perfil</span>
-            </li>
-          </ul>
-        </div>
-        
-        <div class="development-actions">
-          <app-button variant="primary" routerLink="/dashboard">
-            <app-icon name="dashboard"></app-icon>
-            <span>Volver al Dashboard</span>
-          </app-button>
-          
-          <app-button variant="secondary" routerLink="/usuarios">
-            <app-icon name="people"></app-icon>
-            <span>Gestionar Usuarios</span>
-          </app-button>
+        <!-- Información adicional -->
+        <div class="info-box">
+          <app-icon name="info" class="info-icon"></app-icon>
+          <div class="info-content">
+            <h3>¿Qué puedes hacer mientras tanto?</h3>
+            <ul>
+              <li>Explora otras funcionalidades disponibles</li>
+              <li>Revisa el dashboard principal</li>
+              <li>Contacta al administrador si necesitas acceso urgente</li>
+            </ul>
+          </div>
         </div>
       </div>
       
-      <div class="development-timeline">
-        <h3>Próximas funcionalidades</h3>
-        <div class="timeline-item">
-          <div class="timeline-icon">
-            <app-icon name="pets"></app-icon>
-          </div>
-          <div class="timeline-content">
-            <h4>Gestión de Mascotas</h4>
-            <p>Registro y seguimiento de mascotas</p>
-            <span class="timeline-status coming-soon">Próximamente</span>
-          </div>
-        </div>
+      <!-- Botones de acción -->
+      <div class="actions-container">
+        <app-button variant="primary" (buttonClick)="goToDashboard()">
+          <app-icon name="dashboard"></app-icon>
+          <span>Ir al Dashboard</span>
+        </app-button>
         
-        <div class="timeline-item">
-          <div class="timeline-icon">
-            <app-icon name="calendar_today"></app-icon>
-          </div>
-          <div class="timeline-content">
-            <h4>Sistema de Citas</h4>
-            <p>Programación y gestión de citas médicas</p>
-            <span class="timeline-status planned">Planificado</span>
-          </div>
-        </div>
-        
-        <div class="timeline-item">
-          <div class="timeline-icon">
-            <app-icon name="inventory_2"></app-icon>
-          </div>
-          <div class="timeline-content">
-            <h4>Control de Inventario</h4>
-            <p>Gestión de medicamentos y suministros</p>
-            <span class="timeline-status planned">Planificado</span>
-          </div>
-        </div>
+        <app-button variant="secondary" (buttonClick)="goBack()">
+          <app-icon name="arrow_back"></app-icon>
+          <span>Volver</span>
+        </app-button>
+      </div>
+      
+      <!-- Información de contacto -->
+      <div class="contact-info">
+        <p>¿Necesitas ayuda? Contacta al equipo de desarrollo</p>
+        <a href="mailto:soporte@vetapp.com" class="contact-link">
+          <app-icon name="email"></app-icon>
+          soporte&#64;vetapp.com
+        </a>
       </div>
     </div>
   </div>

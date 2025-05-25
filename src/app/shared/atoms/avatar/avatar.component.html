@@ -1,4 +1,4 @@
-<div class="avatar" [ngClass]="avatarClasses">
+<div [ngClass]="avatarClasses">
   <img *ngIf="photoUrl; else initialsTemplate" 
        [src]="photoUrl" 
        [alt]="altText"

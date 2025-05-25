@@ -10,6 +10,7 @@ import { SharedModule } from '../../shared/shared.module';
 import { UserDetailComponent } from './pages/user-detail/user-detail.component';
 import { UserListComponent } from './pages/user-list/user-list.component';
 import { UserCreateEditComponent } from './pages/user-create-edit/user-create-edit.component';
+import { MyProfileComponent } from './pages/my-profile/my-profile.component';
 
 // Átomos
 import { UserAvatarComponent } from './atoms/user-avatar/user-avatar.component';
@@ -34,6 +35,7 @@ import { UserFormComponent } from './organisms/user-form/user-form.component';
     UserDetailComponent,
     UserListComponent,
     UserCreateEditComponent,
+    MyProfileComponent,
     
     // Átomos
     UserAvatarComponent,

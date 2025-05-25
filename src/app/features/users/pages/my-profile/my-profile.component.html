@@ -1,0 +1,373 @@
+<app-dashboard-layout>
+  <div class="my-profile-page">
+    <!-- Encabezado de página -->
+    <div class="page-header">
+      <div class="header-content">
+        <div class="title-section">
+          <h1>Mi Perfil</h1>
+          <p>Gestiona tu información personal y configuración de cuenta</p>
+        </div>
+      </div>
+
+      <div class="breadcrumb">
+        <a routerLink="/dashboard">Inicio</a>
+        <app-icon name="chevron_right"></app-icon>
+        <span>Mi Perfil</span>
+      </div>
+    </div>
+
+    <!-- Estado de carga -->
+    <div *ngIf="loading" class="loading-section">
+      <app-spinner size="large"></app-spinner>
+      <p>Cargando información del perfil...</p>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="profile-content" *ngIf="!loading && userDetails">
+
+      <!-- Tarjeta de información principal -->
+      <div class="profile-main-card">
+        <div class="profile-header">
+          <div class="avatar-section">
+            <div class="avatar-container">
+              <app-user-avatar 
+                [name]="userDetails.name" 
+                [lastName]="userDetails.lastName" 
+                [photoUrl]="currentPhotoUrl"
+                [active]="userDetails.active" 
+                size="large">
+              </app-user-avatar>
+              
+              <!-- Botón para cambiar foto -->
+              <div class="photo-upload-overlay">
+                <input 
+                  type="file" 
+                  id="photoUpload" 
+                  accept="image/*" 
+                  (change)="onPhotoUpload($event)"
+                  style="display: none;">
+                <button 
+                  class="upload-btn" 
+                  (click)="openPhotoSelector()"
+                  [disabled]="uploadingPhoto">
+                  <app-icon *ngIf="!uploadingPhoto" name="camera_alt"></app-icon>
+                  <app-spinner *ngIf="uploadingPhoto" size="small"></app-spinner>
+                </button>
+              </div>
+
+
+            </div>
+          </div>
+
+          <div class="user-info">
+            <h2 class="user-name">{{ getFullName() }}</h2>
+            <div class="user-role">
+              <app-role-badge [role]="userDetails.role"></app-role-badge>
+            </div>
+            <div class="user-status">
+              <app-status-indicator [active]="userDetails.active" [showLabel]="true" size="medium">
+              </app-status-indicator>
+            </div>
+          </div>
+
+          <div class="profile-actions">
+            <app-button 
+              *ngIf="!editingProfile" 
+              variant="primary" 
+              (buttonClick)="startEditingProfile()">
+              <app-icon name="edit"></app-icon>
+              <span>Editar Perfil</span>
+            </app-button>
+            
+            <app-button 
+              *ngIf="!showPasswordForm" 
+              variant="tertiary" 
+              (buttonClick)="showChangePassword()">
+              <app-icon name="lock"></app-icon>
+              <span>Cambiar Contraseña</span>
+            </app-button>
+          </div>
+        </div>
+
+        <!-- Información de contacto -->
+        <div class="contact-info" *ngIf="!editingProfile">
+          <div class="info-item">
+            <app-icon name="email"></app-icon>
+            <span class="label">Email:</span>
+            <span class="value">{{ userDetails.email }}</span>
+          </div>
+          
+          <div class="info-item" *ngIf="userDetails.lastAccess">
+            <app-icon name="access_time"></app-icon>
+            <span class="label">Último acceso:</span>
+            <span class="value">{{ userDetails.lastAccess | date:'medium' }}</span>
+          </div>
+          
+          <div class="info-item" *ngIf="userDetails.createdAt">
+            <app-icon name="calendar_today"></app-icon>
+            <span class="label">Miembro desde:</span>
+            <span class="value">{{ userDetails.createdAt | date:'mediumDate' }}</span>
+          </div>
+        </div>
+
+        <!-- Formulario de edición de perfil -->
+        <div class="profile-edit-form" *ngIf="editingProfile">
+          <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+            <div class="form-grid">
+              <!-- Nombre -->
+              <div class="form-field">
+                <label for="name" class="required">Nombre</label>
+                <input
+                  id="name"
+                  type="text"
+                  formControlName="name"
+                  placeholder="Ingresa tu nombre"
+                  class="form-input"
+                  [class.error]="name?.invalid && (name?.dirty || name?.touched)"
+                  [class.success]="name?.valid && (name?.dirty || name?.touched)">
+                
+                <div class="field-feedback" *ngIf="name?.invalid && (name?.dirty || name?.touched)">
+                  <app-icon name="error"></app-icon>
+                  <span>{{ getErrorMessage('name') }}</span>
+                </div>
+              </div>
+
+              <!-- Apellido -->
+              <div class="form-field">
+                <label for="lastName" class="required">Apellido</label>
+                <input
+                  id="lastName"
+                  type="text"
+                  formControlName="lastName"
+                  placeholder="Ingresa tu apellido"
+                  class="form-input"
+                  [class.error]="lastName?.invalid && (lastName?.dirty || lastName?.touched)"
+                  [class.success]="lastName?.valid && (lastName?.dirty || lastName?.touched)">
+                
+                <div class="field-feedback" *ngIf="lastName?.invalid && (lastName?.dirty || lastName?.touched)">
+                  <app-icon name="error"></app-icon>
+                  <span>{{ getErrorMessage('lastName') }}</span>
+                </div>
+              </div>
+
+              <!-- Email -->
+              <div class="form-field full-width">
+                <label for="email" class="required">Correo Electrónico</label>
+                <input
+                  id="email"
+                  type="email"
+                  formControlName="email"
+                  placeholder="tu@email.com"
+                  class="form-input"
+                  [class.error]="email?.invalid && (email?.dirty || email?.touched)"
+                  [class.success]="email?.valid && (email?.dirty || email?.touched)">
+                
+                <div class="field-feedback" *ngIf="email?.invalid && (email?.dirty || email?.touched)">
+                  <app-icon name="error"></app-icon>
+                  <span>{{ getErrorMessage('email') }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="form-actions">
+              <app-button 
+                type="button"
+                variant="secondary" 
+                (buttonClick)="cancelEditingProfile()"
+                [disabled]="updating">
+                <app-icon name="close"></app-icon>
+                <span>Cancelar</span>
+              </app-button>
+
+              <button 
+                type="submit"
+                class="submit-btn"
+                [disabled]="profileForm.invalid || updating">
+                <app-icon *ngIf="!updating" name="save"></app-icon>
+                <app-spinner *ngIf="updating" size="small"></app-spinner>
+                <span>{{ updating ? 'Guardando...' : 'Guardar Cambios' }}</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Formulario de cambio de contraseña -->
+      <div class="password-change-card" *ngIf="showPasswordForm">
+        <div class="card-header">
+          <h3>
+            <app-icon name="lock"></app-icon>
+            Cambiar Contraseña
+          </h3>
+          <p>Actualiza tu contraseña para mantener tu cuenta segura</p>
+        </div>
+
+        <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+          <div class="form-grid">
+            <!-- Contraseña actual -->
+            <div class="form-field full-width">
+              <label for="currentPassword" class="required">Contraseña Actual</label>
+              <input
+                id="currentPassword"
+                type="password"
+                formControlName="currentPassword"
+                placeholder="Ingresa tu contraseña actual"
+                class="form-input"
+                [class.error]="currentPassword?.invalid && (currentPassword?.dirty || currentPassword?.touched)">
+              
+              <div class="field-feedback" *ngIf="currentPassword?.invalid && (currentPassword?.dirty || currentPassword?.touched)">
+                <app-icon name="error"></app-icon>
+                <span>{{ getErrorMessage('currentPassword', passwordForm) }}</span>
+              </div>
+            </div>
+
+            <!-- Nueva contraseña -->
+            <div class="form-field">
+              <label for="newPassword" class="required">Nueva Contraseña</label>
+              <input
+                id="newPassword"
+                type="password"
+                formControlName="newPassword"
+                placeholder="Mínimo 6 caracteres"
+                class="form-input"
+                [class.error]="newPassword?.invalid && (newPassword?.dirty || newPassword?.touched)"
+                [class.success]="newPassword?.valid && (newPassword?.dirty || newPassword?.touched)">
+              
+              <div class="field-feedback" *ngIf="newPassword?.invalid && (newPassword?.dirty || newPassword?.touched)">
+                <app-icon name="error"></app-icon>
+                <span>{{ getErrorMessage('newPassword', passwordForm) }}</span>
+              </div>
+            </div>
+
+            <!-- Confirmar contraseña -->
+            <div class="form-field">
+              <label for="confirmPassword" class="required">Confirmar Nueva Contraseña</label>
+              <input
+                id="confirmPassword"
+                type="password"
+                formControlName="confirmPassword"
+                placeholder="Repite la nueva contraseña"
+                class="form-input"
+                [class.error]="confirmPassword?.invalid && (confirmPassword?.dirty || confirmPassword?.touched)"
+                [class.success]="confirmPassword?.valid && confirmPassword?.value && (confirmPassword?.dirty || confirmPassword?.touched)">
+              
+              <div class="field-feedback" *ngIf="confirmPassword?.invalid && (confirmPassword?.dirty || confirmPassword?.touched)">
+                <app-icon name="error"></app-icon>
+                <span>{{ getErrorMessage('confirmPassword', passwordForm) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botones de acción -->
+          <div class="form-actions">
+            <app-button 
+              type="button"
+              variant="secondary" 
+              (buttonClick)="cancelChangePassword()"
+              [disabled]="updating">
+              <app-icon name="close"></app-icon>
+              <span>Cancelar</span>
+            </app-button>
+
+            <button 
+              type="submit"
+              class="submit-btn"
+              [disabled]="passwordForm.invalid || updating">
+              <app-icon *ngIf="!updating" name="lock_reset"></app-icon>
+              <app-spinner *ngIf="updating" size="small"></app-spinner>
+              <span>{{ updating ? 'Actualizando...' : 'Cambiar Contraseña' }}</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Estadísticas del veterinario -->
+      <div class="stats-card" *ngIf="isVeterinarian() && userStats">
+        <div class="card-header">
+          <h3>
+            <app-icon name="analytics"></app-icon>
+            Mis Estadísticas
+          </h3>
+          <p>Resumen de tu actividad profesional</p>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-icon">
+              <app-icon name="local_hospital"></app-icon>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">{{ userStats.consultations }}</div>
+              <div class="stat-label">Consultas Realizadas</div>
+            </div>
+          </div>
+
+          <div class="stat-item">
+            <div class="stat-icon">
+              <app-icon name="vaccines"></app-icon>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">{{ userStats.vaccinations }}</div>
+              <div class="stat-label">Vacunaciones Aplicadas</div>
+            </div>
+          </div>
+
+          <div class="stat-item">
+            <div class="stat-icon">
+              <app-icon name="calendar_today"></app-icon>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">{{ userStats.appointments }}</div>
+              <div class="stat-label">Citas Programadas</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actividad reciente -->
+      <div class="activity-card">
+        <div class="card-header">
+          <h3>
+            <app-icon name="history"></app-icon>
+            Mi Actividad Reciente
+          </h3>
+          <p>Últimas acciones realizadas en el sistema</p>
+        </div>
+
+        <div class="activity-content" *ngIf="recentActivity.length > 0; else noActivityTemplate">
+          <div class="activity-item" *ngFor="let activity of recentActivity">
+            <div class="activity-icon" [ngClass]="'activity-' + activity.color">
+              <app-icon [name]="activity.icon"></app-icon>
+            </div>
+            <div class="activity-details">
+              <div class="activity-title">{{ activity.title }}</div>
+              <div class="activity-description" *ngIf="activity.description">{{ activity.description }}</div>
+              <div class="activity-time">{{ activity.time }}</div>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #noActivityTemplate>
+          <div class="no-activity">
+            <app-icon name="info"></app-icon>
+            <p>No hay actividad reciente registrada</p>
+          </div>
+        </ng-template>
+      </div>
+
+    </div>
+
+    <!-- Estado de error -->
+    <div *ngIf="!loading && !userDetails" class="error-section">
+      <app-icon name="error"></app-icon>
+      <h3>Error al cargar el perfil</h3>
+      <p>No se pudo cargar la información de tu perfil. Por favor, intenta nuevamente.</p>
+      <app-button variant="primary" (buttonClick)="loadUserData()">
+        <app-icon name="refresh"></app-icon>
+        <span>Reintentar</span>
+      </app-button>
+    </div>
+
+  </div>
+</app-dashboard-layout> 

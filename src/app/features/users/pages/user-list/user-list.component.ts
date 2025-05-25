@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { UserService, UserSearchResponse } from '../../services/user.service';
@@ -19,9 +19,12 @@ export class UserListComponent implements OnInit, OnDestroy {
   activeUsers: number = 0;
   veterinarians: number = 0;
   
+  // Mapa para almacenar las fotos de los usuarios
+  userPhotos: Map<number, string | null> = new Map();
+  
   // Filtros y paginación
   currentPage: number = 0;
-  pageSize: number = 10;
+  pageSize: number = 6;
   totalPages: number = 0;
   totalElements: number = 0;
   
@@ -40,8 +43,7 @@ export class UserListComponent implements OnInit, OnDestroy {
     { value: 'id', label: 'Por ID de Usuario', description: 'Buscar usuario específico por ID' },
     { value: 'email', label: 'Por Email', description: 'Buscar usuario por dirección de email' },
     { value: 'role', label: 'Por Rol Específico', description: 'Mostrar todos los usuarios de un rol' },
-    { value: 'active', label: 'Solo Usuarios Activos', description: 'Mostrar únicamente usuarios activos' },
-    { value: 'stats', label: 'Veterinarios con Estadísticas', description: 'Usuarios veterinarios con sus estadísticas' }
+    { value: 'active', label: 'Solo Usuarios Activos', description: 'Mostrar únicamente usuarios activos' }
   ];
   
   // Estado de búsqueda
@@ -94,6 +96,9 @@ export class UserListComponent implements OnInit, OnDestroy {
           const endIndex = startIndex + this.pageSize;
           this.users = allUsers.slice(startIndex, endIndex);
           
+          // Cargar fotos de los usuarios visibles
+          this.loadUserPhotos(this.users);
+          
           this.loading = false;
         },
         error: (error) => {
@@ -102,6 +107,35 @@ export class UserListComponent implements OnInit, OnDestroy {
           this.loading = false;
         }
       });
+  }
+
+  /**
+   * Carga las fotos de una lista de usuarios
+   */
+  private loadUserPhotos(users: User[]): void {
+    users.forEach(user => {
+      // Solo cargar si no está ya en el mapa
+      if (!this.userPhotos.has(user.id)) {
+        this.userService.getUserPhoto(user.id)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: (response) => {
+              this.userPhotos.set(user.id, response.photoUrl);
+            },
+            error: (error) => {
+              console.error(`Error al cargar foto del usuario ${user.id}:`, error);
+              this.userPhotos.set(user.id, null);
+            }
+          });
+      }
+    });
+  }
+
+  /**
+   * Obtiene la foto de un usuario específico
+   */
+  getUserPhotoUrl(userId: number): string | null {
+    return this.userPhotos.get(userId) || null;
   }
 
   /**
@@ -134,6 +168,10 @@ export class UserListComponent implements OnInit, OnDestroy {
           this.users = response.content;
           this.totalPages = response.totalPages;
           this.totalElements = response.totalElements;
+          
+          // Cargar fotos de los usuarios encontrados
+          this.loadUserPhotos(this.users);
+          
           this.loading = false;
         },
         error: (error) => {
@@ -190,21 +228,27 @@ export class UserListComponent implements OnInit, OnDestroy {
     const user = this.users.find(u => u.id === userId);
     if (!user) return;
 
-    const confirmMessage = `¿Estás seguro de que deseas eliminar al usuario "${user.name} ${user.lastName}"?`;
+    const confirmMessage = `¿Estás seguro de que deseas eliminar al usuario "${user.name} ${user.lastName}"?\n\n` +
+      `Esta acción desactivará al usuario. Si deseas eliminarlo permanentemente, selecciona "Eliminar permanentemente".`;
     
-    if (confirm(confirmMessage)) {
-      this.userService.deleteUser(userId)
+    const deleteType = confirm(confirmMessage) ? 
+      (confirm('¿Deseas eliminar permanentemente al usuario? Esta acción no se puede deshacer.') ? 'permanent' : 'soft') : 
+      null;
+
+    if (deleteType) {
+      const deleteOperation = deleteType === 'permanent' ? 
+        this.userService.deleteUserPermanently(userId) : 
+        this.userService.deleteUser(userId);
+
+      deleteOperation
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: () => {
-            this.toastService.success(`Usuario "${user.name} ${user.lastName}" eliminado correctamente`);
+            const actionType = deleteType === 'permanent' ? 'eliminado permanentemente' : 'desactivado';
+            this.toastService.success(`Usuario "${user.name} ${user.lastName}" ${actionType} correctamente`);
             
             // Recargar manteniendo el contexto actual
-            if (this.isSearching && this.hasActiveFilters()) {
-              this.searchUsers(); // Mantener búsqueda activa
-            } else {
-              this.loadAllUsers(); // Recargar lista completa
-            }
+            this.refreshData();
             this.loadUserStats(); // Actualizar estadísticas
           },
           error: (error) => {
@@ -275,9 +319,6 @@ export class UserListComponent implements OnInit, OnDestroy {
       case 'active':
         this.searchActiveUsers();
         break;
-      case 'stats':
-        this.searchVeterinariansWithStats();
-        break;
       default:
         this.loadAllUsers();
     }
@@ -312,6 +353,10 @@ export class UserListComponent implements OnInit, OnDestroy {
           this.users = response.content;
           this.totalPages = response.totalPages;
           this.totalElements = response.totalElements;
+          
+          // Cargar fotos de los usuarios encontrados
+          this.loadUserPhotos(this.users);
+          
           this.loading = false;
         },
         error: (error) => {
@@ -344,6 +389,10 @@ export class UserListComponent implements OnInit, OnDestroy {
           this.totalElements = 1;
           this.totalPages = 1;
           this.currentPage = 0;
+          
+          // Cargar foto del usuario encontrado
+          this.loadUserPhotos([user]);
+          
           this.loading = false;
           this.toastService.success(`Usuario encontrado: ${user.name} ${user.lastName}`);
         },
@@ -379,6 +428,10 @@ export class UserListComponent implements OnInit, OnDestroy {
           this.totalElements = 1;
           this.totalPages = 1;
           this.currentPage = 0;
+          
+          // Cargar foto del usuario encontrado
+          this.loadUserPhotos([user]);
+          
           this.loading = false;
           this.toastService.success(`Usuario encontrado: ${user.name} ${user.lastName}`);
         },
@@ -419,6 +472,10 @@ export class UserListComponent implements OnInit, OnDestroy {
           
           // Aplicar paginación manual
           this.users = users.slice(0, this.pageSize);
+          
+          // Cargar fotos de los usuarios encontrados
+          this.loadUserPhotos(this.users);
+          
           this.loading = false;
           
           this.toastService.success(`${users.length} usuarios encontrados con rol ${this.getRoleDisplayName(role)}`);
@@ -450,6 +507,10 @@ export class UserListComponent implements OnInit, OnDestroy {
           
           // Aplicar paginación manual
           this.users = users.slice(0, this.pageSize);
+          
+          // Cargar fotos de los usuarios encontrados
+          this.loadUserPhotos(this.users);
+          
           this.loading = false;
           
           this.toastService.success(`${users.length} usuarios activos encontrados`);
@@ -460,58 +521,6 @@ export class UserListComponent implements OnInit, OnDestroy {
           this.loading = false;
         }
       });
-  }
-
-  /**
-   * Búsqueda de veterinarios con estadísticas
-   */
-  searchVeterinariansWithStats(): void {
-    this.loading = true;
-    this.isSearching = true;
-    this.searchResultType = 'Veterinarios con Estadísticas';
-
-    this.userService.getUsersByRole('VETERINARIAN')
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (veterinarians: User[]) => {
-          this.users = veterinarians;
-          this.totalElements = veterinarians.length;
-          this.totalPages = Math.ceil(veterinarians.length / this.pageSize);
-          this.currentPage = 0;
-          
-          // Aplicar paginación manual
-          this.users = veterinarians.slice(0, this.pageSize);
-          this.loading = false;
-          
-          this.toastService.success(`${veterinarians.length} veterinarios encontrados`);
-          
-          // Cargar estadísticas para cada veterinario (opcional)
-          this.loadVeterinarianStats();
-        },
-        error: (error) => {
-          console.error('Error al buscar veterinarios:', error);
-          this.toastService.error('Error al buscar veterinarios');
-          this.loading = false;
-        }
-      });
-  }
-
-  /**
-   * Carga estadísticas para veterinarios (método auxiliar)
-   */
-  private loadVeterinarianStats(): void {
-    this.users.forEach(vet => {
-      this.userService.getUserStats(vet.id).subscribe({
-        next: (stats) => {
-          // Aquí podrías agregar las estadísticas al objeto usuario
-          // o mostrarlas de alguna manera en la UI
-          console.log(`Estadísticas de ${vet.name}:`, stats);
-        },
-        error: (error) => {
-          console.log(`Error cargando estadísticas de ${vet.name}:`, error);
-        }
-      });
-    });
   }
 
   /**
@@ -554,7 +563,7 @@ export class UserListComponent implements OnInit, OnDestroy {
     this.currentPage = page;
     
     if (this.isSearching) {
-      this.searchUsers(); // Si está en modo búsqueda, usar search
+      this.executeSearch(); // Si está en modo búsqueda, ejecutar la búsqueda actual
     } else {
       this.loadAllUsers(); // Si está en modo lista completa, usar findAll
     }
@@ -564,8 +573,8 @@ export class UserListComponent implements OnInit, OnDestroy {
    * Recarga los datos
    */
   refreshData(): void {
-    if (this.isSearching && this.hasActiveFilters()) {
-      this.searchUsers(); // Si hay filtros activos, mantener búsqueda
+    if (this.isSearching) {
+      this.executeSearch(); // Si está en modo búsqueda, ejecutar la búsqueda actual
     } else {
       this.loadAllUsers(); // Sino, cargar lista completa
     }
@@ -613,5 +622,37 @@ export class UserListComponent implements OnInit, OnDestroy {
     }
     
     return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
+  }
+
+  deactivateUser(userId: number): void {
+    const user = this.users.find(u => u.id === userId);
+    if (!user) return;
+    if (confirm(`¿Seguro que deseas desactivar a "${user.name} ${user.lastName}"?`)) {
+      this.userService.deleteUser(userId)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.toastService.success(`Usuario desactivado correctamente`);
+            this.refreshData();
+          },
+          error: () => this.toastService.error('Error al desactivar usuario')
+        });
+    }
+  }
+
+  activateUser(userId: number): void {
+    const user = this.users.find(u => u.id === userId);
+    if (!user) return;
+    if (confirm(`¿Seguro que deseas ACTIVAR a "${user.name} ${user.lastName}"?`)) {
+      this.userService.activateUser(userId)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.toastService.success(`Usuario activado correctamente`);
+            this.refreshData();
+          },
+          error: () => this.toastService.error('Error al activar usuario')
+        });
+    }
   }
 }

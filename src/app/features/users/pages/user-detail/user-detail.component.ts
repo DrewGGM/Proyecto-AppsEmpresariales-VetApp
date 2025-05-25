@@ -5,7 +5,6 @@ import { takeUntil, switchMap } from 'rxjs/operators';
 
 // Servicios
 import { UserService } from '../../services/user.service';
-import { PermissionService } from '../../services/permission.service';
 import { AuthService } from '../../../../core/auth/services/auth.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { LoaderService } from '../../../../core/services/loader.service';
@@ -13,7 +12,6 @@ import { LoaderService } from '../../../../core/services/loader.service';
 // Modelos
 import { User } from '../../models/user.interface';
 import { UserRole } from '../../models/role.enum';
-import { Permission } from '../../models/permission.interface';
 import { UserActivity, ActivityType } from '../../models/user-activity.interface';
 
 // Interfaces para estadísticas
@@ -21,6 +19,13 @@ export interface UserStats {
   consultations: number;
   vaccinations: number;
   appointments: number;
+}
+
+// Interfaces para capacidades
+export interface CapabilityCategory {
+  name: string;
+  icon: string;
+  capabilities: string[];
 }
 
 @Component({
@@ -33,7 +38,6 @@ export class UserDetailComponent implements OnInit, OnDestroy {
   // Datos del usuario
   user: User | null = null;
   activities: UserActivity[] = [];
-  permissions: Permission[] = [];
   userStats: UserStats = {
     consultations: 0,
     vaccinations: 0,
@@ -43,14 +47,12 @@ export class UserDetailComponent implements OnInit, OnDestroy {
   // Estados de carga
   loading = true;
   loadingActivities = false;
-  loadingPermissions = false;
   loadingStats = false;
 
   // Permisos del usuario actual
   isAdmin = false;
   canEditUser = false;
   canDeleteUser = false;
-  canManagePermissions = false;
 
   // Configuración
   userId: number | null = null;
@@ -60,7 +62,6 @@ export class UserDetailComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private userService: UserService,
-    private permissionService: PermissionService,
     private authService: AuthService,
     private toastService: ToastService,
     private loaderService: LoaderService
@@ -85,7 +86,6 @@ export class UserDetailComponent implements OnInit, OnDestroy {
       this.isAdmin = currentUser.role === 'ADMIN';
       this.canEditUser = this.isAdmin || this.authService.hasPermission('EDIT_USERS');
       this.canDeleteUser = this.isAdmin || this.authService.hasPermission('DELETE_USERS');
-      this.canManagePermissions = this.isAdmin || this.authService.hasPermission('MANAGE_PERMISSIONS');
     }
   }
 
@@ -123,7 +123,6 @@ export class UserDetailComponent implements OnInit, OnDestroy {
 
           // Cargar datos relacionados en paralelo
           const requests = [
-            this.loadUserPermissions(),
             this.loadUserActivities()
           ];
 
@@ -144,28 +143,6 @@ export class UserDetailComponent implements OnInit, OnDestroy {
           console.error('Error loading user data:', error);
           this.handleError('No se pudo cargar la información del usuario');
         }
-      });
-  }
-
-  /**
-   * Carga los permisos del usuario
-   */
-  private loadUserPermissions(): Promise<void> {
-    if (!this.userId) return Promise.resolve();
-
-    this.loadingPermissions = true;
-
-    return this.permissionService.getUserPermissions(this.userId)
-      .pipe(takeUntil(this.destroy$))
-      .toPromise()
-      .then(permissions => {
-        this.permissions = permissions || [];
-        this.loadingPermissions = false;
-      })
-      .catch(error => {
-        console.error('Error loading permissions:', error);
-        this.loadingPermissions = false;
-        this.toastService.warning('No se pudieron cargar los permisos del usuario');
       });
   }
 
@@ -229,16 +206,26 @@ export class UserDetailComponent implements OnInit, OnDestroy {
     if (!this.user) return;
 
     const userName = `${this.user.name} ${this.user.lastName}`;
-    const confirmMessage = `¿Estás seguro de que deseas eliminar al usuario "${userName}"?\n\nEsta acción no se puede deshacer.`;
+    const confirmMessage = `¿Estás seguro de que deseas eliminar al usuario "${userName}"?\n\n` +
+      `Esta acción desactivará al usuario. Si deseas eliminarlo permanentemente, selecciona "Eliminar permanentemente".`;
 
-    if (confirm(confirmMessage)) {
+    const deleteType = confirm(confirmMessage) ? 
+      (confirm('¿Deseas eliminar permanentemente al usuario? Esta acción no se puede deshacer.') ? 'permanent' : 'soft') : 
+      null;
+
+    if (deleteType) {
       this.loaderService.show();
 
-      this.userService.deleteUser(this.user.id)
+      const deleteOperation = deleteType === 'permanent' ? 
+        this.userService.deleteUserPermanently(this.user.id) : 
+        this.userService.deleteUser(this.user.id);
+
+      deleteOperation
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: () => {
-            this.toastService.success(`Usuario "${userName}" eliminado correctamente`);
+            const actionType = deleteType === 'permanent' ? 'eliminado permanentemente' : 'desactivado';
+            this.toastService.success(`Usuario "${userName}" ${actionType} correctamente`);
             this.router.navigate(['/usuarios']);
           },
           error: (error) => {
@@ -248,43 +235,6 @@ export class UserDetailComponent implements OnInit, OnDestroy {
           }
         });
     }
-  }
-
-  /**
-   * Actualiza el estado de un permiso
-   */
-  onPermissionChange(permissionId: number, event: Event): void {
-    if (!this.user || !this.canManagePermissions) return;
-
-    const target = event.target as HTMLInputElement;
-    const granted = target.checked;
-
-    this.loaderService.show();
-
-    this.permissionService.updateUserPermission(this.user.id, permissionId, granted)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: () => {
-          this.toastService.success('Permiso actualizado correctamente');
-          this.loadUserPermissions();
-          this.loaderService.hide();
-        },
-        error: (error) => {
-          console.error('Error updating permission:', error);
-          this.toastService.error('No se pudo actualizar el permiso');
-          this.loaderService.hide();
-        }
-      });
-  }
-
-  /**
-   * Abre el gestor de permisos
-   */
-  managePermissions(): void {
-    if (!this.user) return;
-
-    // Aquí se podría abrir un modal o navegar a otra página
-    this.toastService.info('Funcionalidad de gestión avanzada de permisos en desarrollo');
   }
 
   /**
@@ -330,7 +280,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
   getActivityIcon(activityType: ActivityType): string {
     switch (activityType) {
       case 'consultation':
-        return 'medical_services';
+        return 'local_hospital';
       case 'vaccination':
         return 'healing';
       case 'login':
@@ -386,5 +336,199 @@ export class UserDetailComponent implements OnInit, OnDestroy {
       const years = Math.floor(diffDays / 365);
       return `Hace ${years} año${years > 1 ? 's' : ''}`;
     }
+  }
+
+  deactivateUser(userId: number): void {
+    const user = this.user;
+    if (!user || user.id !== userId) return;
+    if (confirm(`¿Seguro que deseas desactivar a "${user.name} ${user.lastName}"?`)) {
+      this.userService.deleteUser(userId)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.toastService.success(`Usuario desactivado correctamente`);
+            this.refreshUserData();
+          },
+          error: () => this.toastService.error('Error al desactivar usuario')
+        });
+    }
+  }
+
+  deleteUserPermanently(userId: number): void {
+    const user = this.user;
+    if (!user || user.id !== userId) return;
+    if (confirm(`¿Seguro que deseas eliminar PERMANENTEMENTE a "${user.name} ${user.lastName}"? Esta acción no se puede deshacer.`)) {
+      this.userService.deleteUserPermanently(userId)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.toastService.success(`Usuario eliminado permanentemente`);
+            this.refreshUserData();
+          },
+          error: () => this.toastService.error('Error al eliminar usuario')
+        });
+    }
+  }
+
+  /**
+   * Obtiene el ícono del rol
+   */
+  getRoleIcon(role: string): string {
+    switch (role) {
+      case 'ADMIN':
+        return 'admin_panel_settings';
+      case 'VETERINARIAN':
+        return 'local_hospital';
+      case 'RECEPTIONIST':
+        return 'support_agent';
+      default:
+        return 'person';
+    }
+  }
+
+  /**
+   * Obtiene la descripción del rol
+   */
+  getRoleDescription(role: string): string {
+    switch (role) {
+      case 'ADMIN':
+        return 'Acceso completo al sistema con capacidades de administración y gestión de usuarios.';
+      case 'VETERINARIAN':
+        return 'Profesional médico veterinario con acceso a consultas, diagnósticos y tratamientos.';
+      case 'RECEPTIONIST':
+        return 'Personal de recepción con acceso a gestión de citas, clientes y mascotas.';
+      default:
+        return 'Usuario del sistema con permisos básicos.';
+    }
+  }
+
+  /**
+   * Obtiene las capacidades del usuario según su rol
+   */
+  getUserCapabilities(): CapabilityCategory[] {
+    if (!this.user) return [];
+
+    const baseCapabilities: CapabilityCategory[] = [
+      {
+        name: 'Acceso General',
+        icon: 'login',
+        capabilities: [
+          'Iniciar sesión en el sistema',
+          'Ver su perfil personal',
+          'Cambiar su contraseña'
+        ]
+      }
+    ];
+
+    switch (this.user.role) {
+      case 'ADMIN':
+        return [
+          ...baseCapabilities,
+          {
+            name: 'Gestión de Usuarios',
+            icon: 'people',
+            capabilities: [
+              'Crear nuevos usuarios',
+              'Editar información de usuarios',
+              'Activar/desactivar usuarios',
+              'Eliminar usuarios permanentemente',
+              'Ver estadísticas de usuarios'
+            ]
+          },
+          {
+            name: 'Administración del Sistema',
+            icon: 'settings',
+            capabilities: [
+              'Configurar parámetros del sistema',
+              'Ver logs y actividad del sistema',
+              'Gestionar roles y permisos',
+              'Acceso a todas las funcionalidades'
+            ]
+          }
+        ];
+
+      case 'VETERINARIAN':
+        return [
+          ...baseCapabilities,
+          {
+            name: 'Atención Médica',
+            icon: 'local_hospital',
+            capabilities: [
+              'Realizar consultas médicas',
+              'Crear diagnósticos y tratamientos',
+              'Aplicar vacunas',
+              'Ver historial médico de mascotas'
+            ]
+          },
+          {
+            name: 'Gestión de Citas',
+            icon: 'calendar_today',
+            capabilities: [
+              'Ver citas asignadas',
+              'Programar nuevas citas',
+              'Modificar citas existentes',
+              'Acceder a información de clientes'
+            ]
+          }
+        ];
+
+      case 'RECEPTIONIST':
+        return [
+          ...baseCapabilities,
+          {
+            name: 'Gestión de Clientes',
+            icon: 'people',
+            capabilities: [
+              'Registrar nuevos clientes',
+              'Editar información de clientes',
+              'Ver historial de clientes',
+              'Gestionar información de mascotas'
+            ]
+          },
+          {
+            name: 'Gestión de Citas',
+            icon: 'calendar_today',
+            capabilities: [
+              'Programar citas para clientes',
+              'Modificar citas existentes',
+              'Cancelar citas',
+              'Ver calendario de citas'
+            ]
+          }
+        ];
+
+      default:
+        return baseCapabilities;
+    }
+  }
+
+  /**
+   * Obtiene las restricciones de acceso del usuario
+   */
+  getAccessRestrictions(): string[] {
+    if (!this.user) return [];
+
+    const restrictions: string[] = [];
+
+    if (!this.user.active) {
+      restrictions.push('Cuenta desactivada - No puede iniciar sesión');
+    }
+
+    switch (this.user.role) {
+      case 'VETERINARIAN':
+        restrictions.push('No puede gestionar otros usuarios');
+        restrictions.push('No puede acceder a configuración del sistema');
+        restrictions.push('No puede eliminar registros permanentemente');
+        break;
+
+      case 'RECEPTIONIST':
+        restrictions.push('No puede realizar consultas médicas');
+        restrictions.push('No puede gestionar otros usuarios');
+        restrictions.push('No puede acceder a configuración del sistema');
+        restrictions.push('No puede eliminar registros permanentemente');
+        break;
+    }
+
+    return restrictions;
   }
 }

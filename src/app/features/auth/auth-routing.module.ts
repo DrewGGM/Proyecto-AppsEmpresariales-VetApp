@@ -2,7 +2,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './pages/login/login.component';
-import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
 
 const routes: Routes = [
   {
@@ -12,11 +11,6 @@ const routes: Routes = [
         path: 'login',
         component: LoginComponent,
         data: { title: 'Iniciar Sesión' }
-      },
-      {
-        path: 'forgot-password',
-        component: ForgotPasswordComponent,
-        data: { title: 'Recuperar Contraseña' }
       },
       {
         path: '',

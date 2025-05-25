@@ -146,6 +146,14 @@ export class UserService {
     return this.http.delete<void>(`${this.apiUrl}/${id}/permanent`);
   }
 
+  /**
+   * Activa un usuario desactivado
+   * PUT /users/{id}/activate
+   */
+  activateUser(id: number): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/${id}/activate`, {});
+  }
+
   // ========================================
   // MÉTODOS DE ACTIVIDAD Y ESTADÍSTICAS
   // ========================================
@@ -178,8 +186,30 @@ export class UserService {
     const formData = new FormData();
     formData.append('file', file);
     
-    return this.http.post<{ photoUrl: string; success: boolean }>(`${this.apiUrl}/${userId}/photo`, formData);
+    return this.http.post<{ photoUrl: string; success: boolean }>(`${this.apiUrl}/${userId}/photo`, formData)
+      .pipe(
+        catchError(error => {
+          console.error('Error al subir foto:', error);
+          return throwError(() => error);
+        })
+      );
   }
+
+  /**
+   * Obtiene la URL de la foto de perfil de un usuario
+   * GET /users/{userId}/photo
+   */
+  getUserPhoto(userId: number): Observable<{ photoUrl: string }> {
+    return this.http.get<{ photoUrl: string }>(`${this.apiUrl}/${userId}/photo`)
+      .pipe(
+        catchError(error => {
+          console.error('Error al obtener foto:', error);
+          return throwError(() => error);
+        })
+      );
+  }
+
+
 
   // ========================================
   // MÉTODOS DE UTILIDAD Y VALIDACIÓN

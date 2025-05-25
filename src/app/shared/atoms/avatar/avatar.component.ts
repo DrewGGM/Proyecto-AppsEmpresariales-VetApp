@@ -9,7 +9,8 @@ import { Component, Input } from '@angular/core';
 export class AvatarComponent {
   @Input() name: string = '';
   @Input() lastName: string = '';
-  @Input() photoUrl: string = '';
+  @Input() photoUrl: string | null | undefined = null;
+  @Input() active: boolean = true;
   @Input() size: 'small' | 'medium' | 'large' = 'medium';
 
   get initials(): string {
@@ -23,10 +24,14 @@ export class AvatarComponent {
   }
 
   get avatarClasses(): string[] {
-    return ['avatar', `avatar-${this.size}`];
+    const classes = ['avatar', `avatar-${this.size}`];
+    if (!this.active) {
+      classes.push('avatar-inactive');
+    }
+    return classes;
   }
 
   onImageError(): void {
-    this.photoUrl = '';
+    this.photoUrl = null;
   }
 }

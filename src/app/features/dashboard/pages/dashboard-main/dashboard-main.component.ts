@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { Subject, takeUntil, forkJoin } from 'rxjs';
 import { AuthService } from '../../../../core/auth/services/auth.service';
 import { UserService } from '../../../users/services/user.service';
@@ -23,6 +23,7 @@ interface QuickAction {
   route: string;
   color: string;
   implemented: boolean;
+  requiredPermission?: string;
 }
 
 @Component({
@@ -38,6 +39,9 @@ export class DashboardMainComponent implements OnInit, OnDestroy {
   // Estado de carga
   loading = true;
   
+  // Debug flag - cambiar a false en producción
+  private debugMode = false;
+  
   // Datos
   currentUser: UserSession | null = null;
   quickStats: QuickStat[] = [];
@@ -45,15 +49,24 @@ export class DashboardMainComponent implements OnInit, OnDestroy {
   currentDate = new Date();
   systemStatus: SystemStatus[] = [];
   
-  // Quick Actions (configurables)
-  quickActions: QuickAction[] = [
+  // Quick Actions (configurables por rol)
+  private allQuickActions: QuickAction[] = [
+    {
+      icon: 'account_circle',
+      label: 'Mi Perfil',
+      description: 'Ver y editar mi información personal',
+      route: '/usuarios/mi-perfil',
+      color: 'info',
+      implemented: true
+    },
     {
       icon: 'person_add',
       label: 'Nuevo Usuario',
       description: 'Registrar nuevo miembro del equipo',
       route: '/usuarios/nuevo',
       color: 'primary',
-      implemented: true
+      implemented: true,
+      requiredPermission: 'MANAGE_USERS'
     },
     {
       icon: 'pets',
@@ -61,7 +74,8 @@ export class DashboardMainComponent implements OnInit, OnDestroy {
       description: 'Registrar nueva mascota en el sistema',
       route: '/under-development',
       color: 'secondary',
-      implemented: false
+      implemented: false,
+      requiredPermission: 'MANAGE_PETS'
     },
     {
       icon: 'calendar_today',
@@ -69,17 +83,40 @@ export class DashboardMainComponent implements OnInit, OnDestroy {
       description: 'Programar nueva cita médica',
       route: '/under-development',
       color: 'accent',
-      implemented: false
+      implemented: false,
+      requiredPermission: 'MANAGE_APPOINTMENTS'
     },
     {
-      icon: 'inventory',
+      icon: 'local_hospital',
+      label: 'Nueva Consulta',
+      description: 'Registrar consulta médica',
+      route: '/under-development',
+      color: 'success',
+      implemented: false,
+      requiredPermission: 'MANAGE_CONSULTATIONS'
+    },
+    {
+      icon: 'folder',
       label: 'Gestionar Inventario',
       description: 'Actualizar stock de medicamentos',
       route: '/under-development',
       color: 'warning',
-      implemented: false
+      implemented: false,
+      requiredPermission: 'MANAGE_INVENTORY'
+    },
+    {
+      icon: 'settings',
+      label: 'Configuración',
+      description: 'Configurar sistema',
+      route: '/under-development',
+      color: 'info',
+      implemented: false,
+      requiredPermission: 'MANAGE_SETTINGS'
     }
   ];
+
+  // Quick Actions filtradas por permisos
+  quickActions: QuickAction[] = [];
 
   constructor(
     private authService: AuthService,
@@ -90,6 +127,7 @@ export class DashboardMainComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadCurrentUser();
+    this.filterActionsByRole();
     this.loadDashboardData();
   }
 
@@ -99,10 +137,28 @@ export class DashboardMainComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Detecta cuando la ventana vuelve a tener foco y actualiza los datos
+   */
+  @HostListener('window:focus', ['$event'])
+  onWindowFocus(): void {
+    this.loadDashboardData();
+  }
+
+  /**
    * Carga la información del usuario actual
    */
   private loadCurrentUser(): void {
     this.currentUser = this.authService.getCurrentUser();
+  }
+
+  /**
+   * Filtra las acciones rápidas según el rol del usuario
+   */
+  private filterActionsByRole(): void {
+    this.quickActions = this.allQuickActions.filter(action => {
+      if (!action.requiredPermission) return true;
+      return this.authService.hasPermission(action.requiredPermission);
+    });
   }
 
   /**
@@ -133,7 +189,7 @@ export class DashboardMainComponent implements OnInit, OnDestroy {
         this.loading = false;
       },
       error: (error) => {
-        console.error('Error loading dashboard data:', error);
+        console.error('❌ Error loading dashboard data:', error);
         this.loadFallbackStats();
         this.loadFallbackSystemStatus();
         this.loading = false;
@@ -142,9 +198,30 @@ export class DashboardMainComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Actualiza las estadísticas con datos reales
+   * Actualiza las estadísticas con datos específicos por rol
    */
   private updateQuickStats(data: { allUsers: User[], activeUsers: User[], veterinarians: User[] }): void {
+    const userRole = this.authService.getUserRole();
+    
+    switch (userRole) {
+      case 'ADMIN':
+        this.updateAdminStats(data);
+        break;
+      case 'VETERINARIAN':
+        this.updateVeterinarianStats(data);
+        break;
+      case 'RECEPTIONIST':
+        this.updateReceptionistStats(data);
+        break;
+      default:
+        this.updateBasicStats(data);
+    }
+  }
+
+  /**
+   * Estadísticas para administradores
+   */
+  private updateAdminStats(data: { allUsers: User[], activeUsers: User[], veterinarians: User[] }): void {
     const totalUsers = data.allUsers.length;
     const activeUsers = data.activeUsers.length;
     const veterinarians = data.veterinarians.length;
@@ -155,7 +232,7 @@ export class DashboardMainComponent implements OnInit, OnDestroy {
         icon: 'people',
         label: 'Total Usuarios',
         value: totalUsers,
-        change: `${recentUsers} nuevos esta semana`,
+        change: recentUsers > 0 ? `${recentUsers} nuevos esta semana` : 'Sin nuevos usuarios esta semana',
         changeType: recentUsers > 0 ? 'positive' : 'neutral',
         color: 'primary'
       },
@@ -163,17 +240,105 @@ export class DashboardMainComponent implements OnInit, OnDestroy {
         icon: 'verified_user',
         label: 'Usuarios Activos',
         value: activeUsers,
-        change: `${Math.round((activeUsers / totalUsers) * 100)}% del total`,
+        change: totalUsers > 0 ? `${Math.round((activeUsers / totalUsers) * 100)}% del total` : '0% del total',
         changeType: 'positive',
         color: 'secondary'
       },
       {
-        icon: 'medical_services',
+        icon: 'local_hospital',
         label: 'Veterinarios',
         value: veterinarians,
-        change: `${Math.round((veterinarians / totalUsers) * 100)}% del equipo`,
+        change: totalUsers > 0 ? `${Math.round((veterinarians / totalUsers) * 100)}% del equipo` : '0% del equipo',
         changeType: 'positive',
         color: 'accent'
+      },
+      {
+        icon: 'admin_panel_settings',
+        label: 'Sistema',
+        value: 'Operativo',
+        change: 'Todos los servicios funcionando',
+        changeType: 'positive',
+        color: 'success'
+      }
+    ];
+  }
+
+  /**
+   * Estadísticas para veterinarios
+   */
+  private updateVeterinarianStats(data: { allUsers: User[], activeUsers: User[], veterinarians: User[] }): void {
+    this.quickStats = [
+      {
+        icon: 'pets',
+        label: 'Mascotas Registradas',
+        value: 'N/A',
+        change: 'Próximamente disponible',
+        changeType: 'neutral',
+        color: 'primary'
+      },
+      {
+        icon: 'calendar_today',
+        label: 'Citas Hoy',
+        value: 'N/A',
+        change: 'Próximamente disponible',
+        changeType: 'neutral',
+        color: 'secondary'
+      },
+      {
+        icon: 'local_hospital',
+        label: 'Consultas Pendientes',
+        value: 'N/A',
+        change: 'Próximamente disponible',
+        changeType: 'neutral',
+        color: 'accent'
+      }
+    ];
+  }
+
+  /**
+   * Estadísticas para recepcionistas
+   */
+  private updateReceptionistStats(data: { allUsers: User[], activeUsers: User[], veterinarians: User[] }): void {
+    this.quickStats = [
+      {
+        icon: 'people',
+        label: 'Clientes Registrados',
+        value: 'N/A',
+        change: 'Próximamente disponible',
+        changeType: 'neutral',
+        color: 'primary'
+      },
+      {
+        icon: 'calendar_today',
+        label: 'Citas del Día',
+        value: 'N/A',
+        change: 'Próximamente disponible',
+        changeType: 'neutral',
+        color: 'secondary'
+      },
+      {
+        icon: 'pets',
+        label: 'Mascotas Activas',
+        value: 'N/A',
+        change: 'Próximamente disponible',
+        changeType: 'neutral',
+        color: 'accent'
+      }
+    ];
+  }
+
+  /**
+   * Estadísticas básicas para otros roles
+   */
+  private updateBasicStats(data: { allUsers: User[], activeUsers: User[], veterinarians: User[] }): void {
+    this.quickStats = [
+      {
+        icon: 'dashboard',
+        label: 'Bienvenido',
+        value: 'VetApp',
+        change: 'Sistema de gestión veterinaria',
+        changeType: 'positive',
+        color: 'primary'
       }
     ];
   }
@@ -208,12 +373,66 @@ export class DashboardMainComponent implements OnInit, OnDestroy {
    * Cuenta usuarios creados en la última semana
    */
   private getRecentUsersCount(users: User[]): number {
+    const now = new Date();
     const oneWeekAgo = new Date();
-    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    oneWeekAgo.setDate(now.getDate() - 7);
+    oneWeekAgo.setHours(0, 0, 0, 0); // Inicio del día hace una semana
     
-    return users.filter(user => 
-      user.createdAt && new Date(user.createdAt) > oneWeekAgo
-    ).length;
+    if (this.debugMode) {
+      console.log('📅 Fecha actual:', now);
+      console.log('📅 Fecha límite para usuarios recientes:', oneWeekAgo);
+      console.log('📊 Total usuarios a evaluar:', users.length);
+    }
+    
+    const recentUsers = users.filter(user => {
+      if (!user.createdAt) {
+        if (this.debugMode) {
+          console.log(`⚠️ Usuario sin fecha de creación: ${user.name} ${user.lastName}`);
+        }
+        return false;
+      }
+      
+      // Intentar parsear la fecha en diferentes formatos
+      let userCreatedDate: Date;
+      
+      if (typeof user.createdAt === 'string') {
+        // Si es string, intentar parsearlo
+        userCreatedDate = new Date(user.createdAt);
+      } else if (user.createdAt instanceof Date) {
+        // Si ya es Date
+        userCreatedDate = user.createdAt;
+      } else {
+        if (this.debugMode) {
+          console.log(`⚠️ Formato de fecha no reconocido para ${user.name}: ${user.createdAt}`);
+        }
+        return false;
+      }
+      
+      // Verificar si la fecha es válida
+      if (isNaN(userCreatedDate.getTime())) {
+        if (this.debugMode) {
+          console.log(`⚠️ Fecha inválida para ${user.name}: ${user.createdAt}`);
+        }
+        return false;
+      }
+      
+      const isRecent = userCreatedDate > oneWeekAgo;
+      
+      if (this.debugMode) {
+        console.log(`👤 ${user.name} ${user.lastName}:`);
+        console.log(`   - Creado: ${userCreatedDate}`);
+        console.log(`   - Es reciente: ${isRecent}`);
+        console.log(`   - Días desde creación: ${Math.floor((now.getTime() - userCreatedDate.getTime()) / (1000 * 60 * 60 * 24))}`);
+      }
+      
+      return isRecent;
+    });
+    
+    if (this.debugMode) {
+      console.log(`📊 Resultado final: ${recentUsers.length} usuarios recientes de ${users.length} totales`);
+    }
+    
+    return recentUsers.length;
   }
 
   /**
@@ -292,5 +511,23 @@ export class DashboardMainComponent implements OnInit, OnDestroy {
         type: 'warning'
       }
     ];
+  }
+
+  /**
+   * Obtiene el mensaje de bienvenida específico por rol
+   */
+  getRoleSpecificWelcome(): string {
+    const userRole = this.authService.getUserRole();
+    
+    switch (userRole) {
+      case 'ADMIN':
+        return 'Aquí tienes un resumen completo del sistema y todos los usuarios';
+      case 'VETERINARIAN':
+        return 'Aquí tienes un resumen de tus consultas, citas y pacientes';
+      case 'RECEPTIONIST':
+        return 'Aquí tienes un resumen de las citas y clientes del día';
+      default:
+        return 'Aquí tienes un resumen de la actividad de tu clínica veterinaria';
+    }
   }
 } 

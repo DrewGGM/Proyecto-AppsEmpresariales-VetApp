@@ -3,6 +3,7 @@ import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from
 import { Observable } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
+import { ToastService } from '../../services/toast.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,8 @@ export class RoleGuard implements CanActivate {
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private toastService: ToastService
   ) {}
 
   canActivate(
@@ -49,6 +51,8 @@ export class RoleGuard implements CanActivate {
         if (hasRequiredRole && hasRequiredPermissions) {
           return true;
         } else {
+          // Mostrar mensaje de acceso denegado
+          this.toastService.error('No tienes permisos para acceder a esta sección');
           // Redirigir al dashboard si no tiene permisos
           this.router.navigate(['/dashboard']);
           return false;

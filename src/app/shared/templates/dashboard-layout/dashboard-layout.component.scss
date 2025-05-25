@@ -6,24 +6,6 @@
   background-color: $neutral-bg;
   position: relative;
 
-  // Debug info temporal
-  .debug-info {
-    position: fixed;
-    top: $spacing-xs;
-    right: $spacing-xs;
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: $spacing-xs;
-    border-radius: $border-radius-sm;
-    font-size: 10px;
-    z-index: 9999;
-    
-    @media (min-width: 769px) {
-      display: none; // Solo mostrar en móviles
-    }
-  }
-
-  // Botón flotante para móviles
   .mobile-menu-btn {
     position: fixed;
     top: $spacing-md;
@@ -55,7 +37,6 @@
       font-size: 24px;
     }
 
-    // Solo mostrar en móviles
     display: none;
     
     @media (max-width: $breakpoint-md) {
@@ -100,7 +81,6 @@
   }
 }
 
-// Responsive
 @media (max-width: $breakpoint-md) {
   .dashboard-layout {
     .main-content {

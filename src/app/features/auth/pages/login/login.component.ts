@@ -62,6 +62,8 @@ export class LoginComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
+          this.loginFormComponent.setLoading(false);
+          
           if (response.success) {
             this.toastService.success(`¡Bienvenido ${response.name}!`);
             this.router.navigate([this.returnUrl]);
@@ -70,11 +72,21 @@ export class LoginComponent implements OnInit, OnDestroy {
           }
         },
         error: (error) => {
-          console.error('Error en login:', error);
-          this.handleLoginError(
-            error.error?.message || 
-            'Error de conexión. Por favor, intenta de nuevo.'
-          );
+          this.loginFormComponent.setLoading(false);
+          
+          let errorMessage = 'Error de conexión. Por favor, intenta de nuevo.';
+          
+          if (error.status === 0) {
+            errorMessage = 'No se puede conectar con el servidor. Verifica tu conexión.';
+          } else if (error.status === 401) {
+            errorMessage = 'Credenciales incorrectas. Verifica tu email y contraseña.';
+          } else if (error.status === 500) {
+            errorMessage = 'Error interno del servidor. Intenta más tarde.';
+          } else if (error.error?.message) {
+            errorMessage = error.error.message;
+          }
+          
+          this.handleLoginError(errorMessage);
         }
       });
   }
@@ -87,12 +99,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.toastService.error(message);
   }
 
-  /**
-   * Navega a la página de recuperación de contraseña
-   */
-  onForgotPassword(): void {
-    this.router.navigate(['/auth/forgot-password']);
-  }
+
 
   /**
    * Maneja errores del estado de autenticación

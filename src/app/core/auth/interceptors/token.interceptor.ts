@@ -79,13 +79,13 @@ export class TokenInterceptor implements HttpInterceptor {
           }),
           catchError((error) => {
             this.isRefreshing = false;
-            this.authService.logout();
+            this.authService.logout(false);
             return throwError(() => error);
           })
         );
       } else {
         this.isRefreshing = false;
-        this.authService.logout();
+        this.authService.logout(false);
         return throwError(() => new Error('No refresh token available'));
       }
     } else {

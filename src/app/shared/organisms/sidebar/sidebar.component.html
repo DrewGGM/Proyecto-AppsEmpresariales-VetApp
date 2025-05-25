@@ -22,7 +22,13 @@
   <!-- Información del usuario logueado -->
   <div class="user-info" *ngIf="currentUser">
     <div class="user-avatar">
-      <app-avatar [name]="currentUser.name" [lastName]="currentUser.lastName" size="medium"></app-avatar>
+      <app-avatar 
+        [name]="currentUser.name" 
+        [lastName]="currentUser.lastName" 
+        [photoUrl]="currentUserPhotoUrl"
+        [active]="true" 
+        size="medium">
+      </app-avatar>
     </div>
     <div class="user-details" *ngIf="!isCollapsed || isMobile">
       <div class="user-name">{{ currentUser.name }} {{ currentUser.lastName }}</div>
@@ -42,7 +48,7 @@
       </li>
 
       <!-- Clientes -->
-      <li class="nav-item">
+      <li class="nav-item" *ngIf="canAccessClients()">
         <a routerLink="/clientes" routerLinkActive="active" class="nav-link" (click)="closeMobileSidebar()">
           <app-icon name="people" class="nav-icon"></app-icon>
           <span class="nav-text" *ngIf="!isCollapsed || isMobile">Clientes</span>
@@ -50,7 +56,7 @@
       </li>
 
       <!-- Mascotas -->
-      <li class="nav-item">
+      <li class="nav-item" *ngIf="canAccessPets()">
         <a routerLink="/mascotas" routerLinkActive="active" class="nav-link" (click)="closeMobileSidebar()">
           <app-icon name="pets" class="nav-icon"></app-icon>
           <span class="nav-text" *ngIf="!isCollapsed || isMobile">Mascotas</span>
@@ -58,7 +64,7 @@
       </li>
 
       <!-- Citas -->
-      <li class="nav-item">
+      <li class="nav-item" *ngIf="canAccessAppointments()">
         <a routerLink="/citas" routerLinkActive="active" class="nav-link" (click)="closeMobileSidebar()">
           <app-icon name="event" class="nav-icon"></app-icon>
           <span class="nav-text" *ngIf="!isCollapsed || isMobile">Citas</span>
@@ -66,9 +72,9 @@
       </li>
 
       <!-- Consultas -->
-      <li class="nav-item">
+      <li class="nav-item" *ngIf="canAccessConsultations()">
         <a routerLink="/consultas" routerLinkActive="active" class="nav-link" (click)="closeMobileSidebar()">
-          <app-icon name="medical_services" class="nav-icon"></app-icon>
+          <app-icon name="local_hospital" class="nav-icon"></app-icon>
           <span class="nav-text" *ngIf="!isCollapsed || isMobile">Consultas</span>
         </a>
       </li>
@@ -81,11 +87,27 @@
         </a>
       </li>
 
+      <!-- Inventario -->
+      <li class="nav-item" *ngIf="canAccessInventory()">
+        <a routerLink="/inventario" routerLinkActive="active" class="nav-link" (click)="closeMobileSidebar()">
+          <app-icon name="inventory_2" class="nav-icon"></app-icon>
+          <span class="nav-text" *ngIf="!isCollapsed || isMobile">Inventario</span>
+        </a>
+      </li>
+
       <!-- Divider -->
       <li class="nav-divider" *ngIf="!isCollapsed || isMobile"></li>
 
-      <!-- Configuración -->
+      <!-- Mi Perfil -->
       <li class="nav-item">
+        <a routerLink="/usuarios/mi-perfil" routerLinkActive="active" class="nav-link" (click)="closeMobileSidebar()">
+          <app-icon name="account_circle" class="nav-icon"></app-icon>
+          <span class="nav-text" *ngIf="!isCollapsed || isMobile">Mi Perfil</span>
+        </a>
+      </li>
+
+      <!-- Configuración -->
+      <li class="nav-item" *ngIf="canAccessSettings()">
         <a routerLink="/configuracion" routerLinkActive="active" class="nav-link" (click)="closeMobileSidebar()">
           <app-icon name="settings" class="nav-icon"></app-icon>
           <span class="nav-text" *ngIf="!isCollapsed || isMobile">Configuración</span>

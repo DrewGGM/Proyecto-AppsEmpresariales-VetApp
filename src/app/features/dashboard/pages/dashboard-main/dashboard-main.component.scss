@@ -313,6 +313,16 @@
           app-icon { color: $warning; }
         }
 
+        &.action-success .action-icon {
+          background: rgba($success, 0.1);
+          app-icon { color: $success; }
+        }
+
+        &.action-info .action-icon {
+          background: rgba($info, 0.1);
+          app-icon { color: $info; }
+        }
+
         .action-icon {
           width: 48px;
           height: 48px;

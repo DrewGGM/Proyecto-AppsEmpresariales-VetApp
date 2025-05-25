@@ -4,7 +4,7 @@ import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { tap, catchError, map } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { environment } from '../../../../environments/environment';
-import { LoginCredentials, ForgotPasswordRequest, ResetPasswordRequest } from '../models/credentials.interface';
+import { LoginCredentials } from '../models/credentials.interface';
 import { UserSession, AuthState } from '../models/user-session.interface';
 import { ToastService } from '../../services/toast.service';
 
@@ -42,15 +42,28 @@ export class AuthService {
    */
   private initializeAuthState(): void {
     try {
-      const storedSession = localStorage.getItem(this.STORAGE_KEY);
+      const storedSession = localStorage.getItem(this.STORAGE_KEY) || sessionStorage.getItem(this.STORAGE_KEY);
       if (storedSession) {
         const userSession: UserSession = JSON.parse(storedSession);
+        
+        // Verificar si la sesión ha expirado
+        if (userSession.expiresAt && new Date() > new Date(userSession.expiresAt)) {
+          this.clearStoredSession();
+          return;
+        }
+        
+        // Solo restaurar la sesión si es válida
         this.updateAuthState({
           isAuthenticated: true,
           user: userSession,
           loading: false,
           error: null
         });
+        
+        // Redirigir al dashboard si estamos en la página de login
+        if (this.router.url === '/auth/login' || this.router.url === '/') {
+          this.router.navigate(['/dashboard']);
+        }
       }
     } catch (error) {
       console.error('Error al cargar sesión desde localStorage:', error);
@@ -115,7 +128,7 @@ export class AuthService {
   /**
    * Cierra la sesión del usuario
    */
-  logout(): void {
+  logout(showNotification: boolean = true): void {
     this.clearStoredSession();
     this.updateAuthState({
       isAuthenticated: false,
@@ -124,34 +137,13 @@ export class AuthService {
       error: null
     });
     this.router.navigate(['/auth/login']);
-    this.toastService.success('Sesión cerrada correctamente');
+    
+    if (showNotification) {
+      this.toastService.success('Sesión cerrada correctamente');
+    }
   }
 
-  /**
-   * Solicita restablecimiento de contraseña
-   */
-  forgotPassword(request: ForgotPasswordRequest): Observable<any> {
-    return this.http.post(`${this.API_URL}/forgot-password`, request)
-      .pipe(
-        catchError(error => {
-          const errorMessage = error.error?.message || 'Error al enviar solicitud';
-          return throwError(() => new Error(errorMessage));
-        })
-      );
-  }
 
-  /**
-   * Restablece la contraseña
-   */
-  resetPassword(request: ResetPasswordRequest): Observable<any> {
-    return this.http.post(`${this.API_URL}/reset-password`, request)
-      .pipe(
-        catchError(error => {
-          const errorMessage = error.error?.message || 'Error al restablecer contraseña';
-          return throwError(() => new Error(errorMessage));
-        })
-      );
-  }
 
   /**
    * Verifica si el usuario está autenticado
@@ -189,14 +181,23 @@ export class AuthService {
     const user = this.getCurrentUser();
     if (!user) return false;
     
-    // Lógica básica de permisos por rol
+    // Lógica de permisos por rol
     switch (user.role) {
       case 'ADMIN':
         return true; // Admin tiene todos los permisos
       case 'VETERINARIAN':
-        return ['MANAGE_CONSULTATIONS', 'MANAGE_APPOINTMENTS', 'MANAGE_CUSTOMERS'].includes(permission);
+        return [
+          'MANAGE_CONSULTATIONS', 
+          'MANAGE_APPOINTMENTS', 
+          'MANAGE_CUSTOMERS',
+          'MANAGE_PETS'
+        ].includes(permission);
       case 'RECEPTIONIST':
-        return ['MANAGE_APPOINTMENTS', 'MANAGE_CUSTOMERS'].includes(permission);
+        return [
+          'MANAGE_APPOINTMENTS', 
+          'MANAGE_CUSTOMERS',
+          'MANAGE_PETS'
+        ].includes(permission);
       default:
         return false;
     }
@@ -215,9 +216,29 @@ export class AuthService {
    */
   isTokenExpired(): boolean {
     const user = this.getCurrentUser();
-    if (!user?.expiresAt) return false;
     
-    return new Date() > new Date(user.expiresAt);
+    if (!user) {
+      return true;
+    }
+    
+    if (!user.expiresAt) {
+      return false; // Si no hay fecha de expiración, consideramos el token válido
+    }
+    
+    try {
+      const now = new Date();
+      const expirationDate = new Date(user.expiresAt);
+      
+      // Verificar si la fecha es válida
+      if (isNaN(expirationDate.getTime())) {
+        return false;
+      }
+      
+      return now > expirationDate;
+    } catch (error) {
+      console.error('Error al verificar expiración del token:', error);
+      return false; // En caso de error, consideramos el token válido
+    }
   }
 
   /**
@@ -242,7 +263,7 @@ export class AuthService {
         }
       }),
       catchError(error => {
-        this.logout();
+        this.logout(false);
         return throwError(() => error);
       })
     );

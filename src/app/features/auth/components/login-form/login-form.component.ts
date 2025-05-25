@@ -10,7 +10,6 @@ import { LoginCredentials } from '../../../../core/auth/models/credentials.inter
 })
 export class LoginFormComponent implements OnInit {
   @Output() submitForm = new EventEmitter<LoginCredentials>();
-  @Output() forgotPassword = new EventEmitter<void>();
 
   loginForm!: FormGroup;
   isLoading: boolean = false;
@@ -60,12 +59,7 @@ export class LoginFormComponent implements OnInit {
     });
   }
 
-  /**
-   * Maneja el click en "Olvidé mi contraseña"
-   */
-  onForgotPassword(): void {
-    this.forgotPassword.emit();
-  }
+
 
   /**
    * Setters para controlar el estado desde el componente padre

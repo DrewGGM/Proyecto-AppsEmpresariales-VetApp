@@ -1,7 +1,8 @@
-import { Component, OnInit, OnDestroy, HostListener, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { AuthService } from '../../../core/auth/services/auth.service';
+import { UserService } from '../../../features/users/services/user.service';
 import { UserSession } from '../../../core/auth/models/user-session.interface';
 
 @Component({
@@ -15,37 +16,36 @@ export class SidebarComponent implements OnInit, OnDestroy {
   isMobileOpen: boolean = false;
   isMobile: boolean = false;
   currentUser: UserSession | null = null;
+  currentUserPhotoUrl: string | null = null;
   private destroy$ = new Subject<void>();
+  @Output() mobileSidebarClosed = new EventEmitter<void>();
 
   constructor(
     private authService: AuthService,
+    private userService: UserService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    // Suscribirse al usuario actual
     this.authService.user$
       .pipe(takeUntil(this.destroy$))
       .subscribe(user => {
         this.currentUser = user;
+        if (user) {
+          this.loadCurrentUserPhoto();
+        }
       });
 
-    // Detectar si es móvil al inicializar - múltiple detección
     this.checkIsMobile();
     
-    // Verificar el estado inicial de colapso desde localStorage
-    // En desktop: abierto por defecto, en móvil: cerrado por defecto
     const savedCollapsedState = localStorage.getItem('sidebar-collapsed');
     if (savedCollapsedState !== null) {
-      // Si hay estado guardado, usarlo solo para desktop
       this.isCollapsed = !this.isMobile && savedCollapsedState === 'true';
     } else {
-      // Estado por defecto: abierto en desktop, cerrado en móvil
       this.isCollapsed = false;
     }
     
-    // Detección adicional después de un breve delay
     setTimeout(() => {
       this.checkIsMobile();
       this.cdr.detectChanges();
@@ -57,66 +57,51 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  /**
-   * Escucha cambios en el tamaño de la ventana
-   */
   @HostListener('window:resize', ['$event'])
   onResize(event: any): void {
     this.checkIsMobile();
-    // Cerrar sidebar móvil al cambiar a escritorio
     if (!this.isMobile && this.isMobileOpen) {
       this.isMobileOpen = false;
       this.cdr.detectChanges();
+      this.mobileSidebarClosed.emit();
     }
   }
 
-  /**
-   * Detecta si estamos en un dispositivo móvil
-   */
   private checkIsMobile(): void {
     const previousIsMobile = this.isMobile;
-    this.isMobile = window.innerWidth <= 768; // $breakpoint-md equivale a 768px
+    this.isMobile = window.innerWidth <= 768;
     
-    // Si cambió el estado móvil, forzar detección de cambios
     if (previousIsMobile !== this.isMobile) {
       this.cdr.detectChanges();
     }
   }
 
-  /**
-   * Alterna el estado de colapso del sidebar (solo escritorio)
-   */
   toggleSidebar(): void {
     if (this.isMobile) {
       this.toggleMobileSidebar();
     } else {
       this.isCollapsed = !this.isCollapsed;
-      // Guardar el estado en localStorage
       localStorage.setItem('sidebar-collapsed', this.isCollapsed.toString());
     }
   }
 
-  /**
-   * Alterna el sidebar móvil
-   */
   toggleMobileSidebar(): void {
     this.isMobileOpen = !this.isMobileOpen;
     this.cdr.detectChanges();
+    
+    if (!this.isMobileOpen && this.isMobile) {
+      this.mobileSidebarClosed.emit();
+    }
   }
 
-  /**
-   * Cierra el sidebar móvil
-   */
   closeMobileSidebar(): void {
     if (this.isMobile) {
       this.isMobileOpen = false;
       this.cdr.detectChanges();
+      this.mobileSidebarClosed.emit();
     }
   }
 
-  /**
-   * Obtiene el nombre mostrable del rol del usuario
-   */
   getUserRoleDisplay(role: string): string {
     const roleDisplayMap: { [key: string]: string } = {
       'ADMIN': 'Administrador',
@@ -126,24 +111,56 @@ export class SidebarComponent implements OnInit, OnDestroy {
     return roleDisplayMap[role] || role;
   }
 
-  /**
-   * Verifica si el usuario puede acceder a la gestión de usuarios
-   */
   canAccessUsers(): boolean {
     return this.authService.hasPermission('MANAGE_USERS') || this.authService.hasAdminRole();
   }
 
-  /**
-   * Cierra la sesión del usuario
-   */
+  canAccessClients(): boolean {
+    return this.authService.hasPermission('MANAGE_CUSTOMERS') || this.authService.hasAdminRole();
+  }
+
+  canAccessPets(): boolean {
+    return this.authService.hasPermission('MANAGE_PETS') || this.authService.hasAdminRole();
+  }
+
+  canAccessAppointments(): boolean {
+    return this.authService.hasPermission('MANAGE_APPOINTMENTS') || this.authService.hasAdminRole();
+  }
+
+  canAccessConsultations(): boolean {
+    return this.authService.hasPermission('MANAGE_CONSULTATIONS') || this.authService.hasAdminRole();
+  }
+
+  canAccessInventory(): boolean {
+    return this.authService.hasPermission('MANAGE_INVENTORY') || this.authService.hasAdminRole();
+  }
+
+  canAccessSettings(): boolean {
+    return this.authService.hasPermission('MANAGE_SETTINGS') || this.authService.hasAdminRole();
+  }
+
   logout(): void {
     this.authService.logout();
   }
 
-  /**
-   * Navega a una ruta específica
-   */
   navigateTo(route: string): void {
     this.router.navigate([route]);
+  }
+
+  private loadCurrentUserPhoto(): void {
+    if (!this.currentUser) return;
+    
+    this.userService.getUserPhoto(this.currentUser.userId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.currentUserPhotoUrl = response.photoUrl;
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error al cargar foto del usuario en sidebar:', error);
+          this.currentUserPhotoUrl = null;
+        }
+      });
   }
 }

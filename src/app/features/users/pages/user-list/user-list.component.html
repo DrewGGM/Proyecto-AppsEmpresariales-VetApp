@@ -151,14 +151,6 @@
           </div>
         </div>
 
-        <!-- Búsqueda de Veterinarios con Stats -->
-        <div *ngIf="searchType === 'stats'" class="specific-search">
-          <div class="search-info">
-            <app-icon name="analytics"></app-icon>
-            <p>Esta búsqueda mostrará todos los veterinarios junto con sus estadísticas de consultas, vacunaciones y citas.</p>
-          </div>
-        </div>
-
         <!-- Botones de acción -->
         <div class="filter-actions">
           <app-button 
@@ -220,7 +212,7 @@
       
       <div class="stat-card">
         <div class="stat-icon veterinarian">
-          <app-icon name="medical_services"></app-icon>
+          <app-icon name="local_hospital"></app-icon>
         </div>
         <div class="stat-info">
           <div class="stat-value">{{ veterinarians }}</div>
@@ -252,7 +244,13 @@
       <div class="users-grid" *ngIf="users && users.length > 0">
         <div class="user-card" *ngFor="let user of users" (click)="viewUser(user.id)">
           <div class="user-avatar">
-            <app-avatar [name]="user.name" [lastName]="user.lastName" [photoUrl]="user.photoUrl || ''" size="medium"></app-avatar>
+            <app-avatar 
+              [name]="user.name" 
+              [lastName]="user.lastName" 
+              [photoUrl]="getUserPhotoUrl(user.id)"
+              [active]="user.active" 
+              size="medium">
+            </app-avatar>
           </div>
           <div class="user-details">
             <h3>{{ user.name }} {{ user.lastName }}</h3>
@@ -269,8 +267,14 @@
             <button class="action-btn" (click)="editUser(user.id); $event.stopPropagation()" title="Editar usuario">
               <app-icon name="edit"></app-icon>
             </button>
+            <button *ngIf="user.active" class="action-btn warning" (click)="deactivateUser(user.id); $event.stopPropagation()" title="Desactivar usuario">
+              <app-icon name="block"></app-icon>
+            </button>
+            <button *ngIf="!user.active" class="action-btn success" (click)="activateUser(user.id); $event.stopPropagation()" title="Activar usuario">
+              <app-icon name="check_circle"></app-icon>
+            </button>
             <button class="action-btn danger" (click)="deleteUser(user.id); $event.stopPropagation()" title="Eliminar usuario">
-              <app-icon name="delete"></app-icon>
+              <app-icon name="delete_forever"></app-icon>
             </button>
           </div>
         </div>

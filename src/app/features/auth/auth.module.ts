@@ -7,21 +7,17 @@ import { SharedModule } from '../../shared/shared.module';
 
 // Páginas
 import { LoginComponent } from './pages/login/login.component';
-import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
 
 // Componentes
 import { LoginFormComponent } from './components/login-form/login-form.component';
-import { ResetPasswordFormComponent } from './components/reset-password-form/reset-password-form.component';
 
 @NgModule({
   declarations: [
     // Páginas
     LoginComponent,
-    ForgotPasswordComponent,
     
     // Componentes (Organismos específicos de auth)
-    LoginFormComponent,
-    ResetPasswordFormComponent
+    LoginFormComponent
   ],
   imports: [
     CommonModule,

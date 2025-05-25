@@ -48,9 +48,10 @@ export class ActivityService {
    * Obtiene las actividades recientes del sistema
    */
   getRecentActivities(limit: number = 10): Observable<ActivityResponse> {
-    return this.http.get<ActivityResponse>(`${this.apiUrl}/activities/recent?limit=${limit}`).pipe(
+    const timestamp = new Date().getTime();
+    return this.http.get<ActivityResponse>(`${this.apiUrl}/activities/recent?limit=${limit}&_t=${timestamp}`).pipe(
       catchError(error => {
-        console.error('Error fetching recent activities:', error);
+        console.error('❌ Error fetching recent activities:', error);
         return of({
           status: 'error',
           message: 'Error al cargar actividades',
@@ -83,10 +84,21 @@ export class ActivityService {
   mapToRecentActivities(activityData: ActivityResponse['data']): RecentActivity[] {
     const activities: RecentActivity[] = [];
 
+    // Nuevos usuarios (prioridad alta)
+    activityData.new_users.slice(0, 3).forEach(user => {
+      activities.push({
+        icon: 'person_add',
+        title: 'Nuevo usuario registrado',
+        description: `${user.name} ${user.last_name} se unió como ${this.getRoleDisplayName(user.role)}`,
+        time: this.formatTimeAgo(user.created_at),
+        color: 'success'
+      });
+    });
+
     // Consultas recientes
     activityData.recent_consultations.slice(0, 2).forEach(consultation => {
       activities.push({
-        icon: 'medical_services',
+        icon: 'local_hospital',
         title: 'Nueva consulta médica',
         description: `${consultation.pet_name} atendido por Dr. ${consultation.veterinarian_name}`,
         time: this.formatTimeAgo(consultation.created_at),
@@ -105,19 +117,8 @@ export class ActivityService {
       });
     });
 
-    // Nuevos usuarios
-    activityData.new_users.slice(0, 2).forEach(user => {
-      activities.push({
-        icon: 'person_add',
-        title: 'Nuevo usuario registrado',
-        description: `${user.name} ${user.last_name} se unió como ${this.getRoleDisplayName(user.role)}`,
-        time: this.formatTimeAgo(user.created_at),
-        color: 'success'
-      });
-    });
-
     // Nuevas mascotas
-    activityData.new_pets.slice(0, 2).forEach(pet => {
+    activityData.new_pets.slice(0, 1).forEach(pet => {
       activities.push({
         icon: 'pets',
         title: 'Nueva mascota registrada',
@@ -138,10 +139,10 @@ export class ActivityService {
       });
     });
 
-    // Limitar a máximo 4 actividades y ordenar por fecha
+    // Limitar a máximo 5 actividades y ordenar por fecha
     return activities
       .sort((a, b) => this.getTimeStamp(b.time) - this.getTimeStamp(a.time))
-      .slice(0, 4);
+      .slice(0, 5);
   }
 
   /**

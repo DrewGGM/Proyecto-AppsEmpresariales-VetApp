@@ -41,7 +41,7 @@
               </app-button>
 
               <app-button *ngIf="canDeleteUser" variant="danger" size="sm" (buttonClick)="deleteUser()">
-                <app-icon name="delete"></app-icon>
+                <app-icon name="delete_forever"></app-icon>
                 <span>Eliminar</span>
               </app-button>
             </div>
@@ -129,49 +129,75 @@
         </div>
       </div>
 
-      <!-- Panel de permisos -->
-      <div class="permissions-section">
-        <div class="permissions-card">
+      <!-- Panel de capacidades y accesos -->
+      <div class="capabilities-section">
+        <div class="capabilities-card">
           <div class="card-header">
-            <app-icon name="security"></app-icon>
-            <h3>Permisos y Accesos</h3>
+            <app-icon name="verified_user"></app-icon>
+            <h3>Capacidades y Accesos</h3>
           </div>
 
-          <div class="permissions-content" *ngIf="!loadingPermissions; else permissionsLoadingTemplate">
-            <div class="permission-item" *ngFor="let permission of permissions">
-              <div class="permission-info">
-                <label class="permission-label">
-                  <input type="checkbox" [checked]="permission.granted" [disabled]="!canManagePermissions"
-                    (change)="onPermissionChange(permission.id, $event)">
-                  <span class="permission-name">{{ permission.name }}</span>
-                </label>
-                <div class="permission-description" *ngIf="permission.description">
-                  {{ permission.description }}
+          <div class="capabilities-content">
+            <div class="role-info">
+              <div class="role-badge">
+                <app-icon [name]="getRoleIcon(user.role)"></app-icon>
+                <span>{{ getRoleLabel(user.role) }}</span>
+              </div>
+              <p class="role-description">{{ getRoleDescription(user.role) }}</p>
+            </div>
+
+            <div class="capabilities-grid">
+              <div class="capability-category" *ngFor="let category of getUserCapabilities()">
+                <h4 class="category-title">
+                  <app-icon [name]="category.icon"></app-icon>
+                  {{ category.name }}
+                </h4>
+                <ul class="capability-list">
+                  <li *ngFor="let capability of category.capabilities" class="capability-item">
+                    <app-icon name="check_circle" class="capability-icon"></app-icon>
+                    <span>{{ capability }}</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="access-restrictions" *ngIf="getAccessRestrictions().length > 0">
+              <h4 class="restrictions-title">
+                <app-icon name="block"></app-icon>
+                Restricciones de Acceso
+              </h4>
+              <ul class="restrictions-list">
+                <li *ngFor="let restriction of getAccessRestrictions()" class="restriction-item">
+                  <app-icon name="remove_circle" class="restriction-icon"></app-icon>
+                  <span>{{ restriction }}</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="system-access">
+              <h4 class="access-title">
+                <app-icon name="admin_panel_settings"></app-icon>
+                Acceso al Sistema
+              </h4>
+              <div class="access-info">
+                <div class="access-item">
+                  <span class="access-label">Estado de cuenta:</span>
+                  <span class="access-value" [class.active]="user.active" [class.inactive]="!user.active">
+                    {{ user.active ? 'Activa' : 'Inactiva' }}
+                  </span>
+                </div>
+                <div class="access-item" *ngIf="user.lastAccess">
+                  <span class="access-label">Último acceso:</span>
+                  <span class="access-value">{{ user.lastAccess | date:'medium' }}</span>
+                </div>
+                <div class="access-item">
+                  <span class="access-label">Puede iniciar sesión:</span>
+                  <span class="access-value" [class.yes]="user.active" [class.no]="!user.active">
+                    {{ user.active ? 'Sí' : 'No' }}
+                  </span>
                 </div>
               </div>
-
-              <div class="permission-status" [ngClass]="permission.granted ? 'granted' : 'restricted'">
-                {{ permission.granted ? 'Concedido' : 'Restringido' }}
-              </div>
             </div>
-
-            <div class="no-permissions" *ngIf="permissions.length === 0">
-              <app-icon name="info"></app-icon>
-              <span>No hay permisos configurados para este usuario.</span>
-            </div>
-          </div>
-
-          <ng-template #permissionsLoadingTemplate>
-            <div class="loading-permissions">
-              <app-spinner size="medium"></app-spinner>
-              <span>Cargando permisos...</span>
-            </div>
-          </ng-template>
-
-          <div class="permissions-actions" *ngIf="canManagePermissions">
-            <app-button variant="secondary" (buttonClick)="managePermissions()">
-              Gestionar Permisos
-            </app-button>
           </div>
         </div>
       </div>

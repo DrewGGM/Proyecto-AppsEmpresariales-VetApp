@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes, PreloadAllModules } from '@angular/router';
 import { AuthGuard } from './core/auth/guards/auth.guard';
+import { RoleGuard } from './core/auth/guards/role.guard';
 import { UnderDevelopmentComponent } from './shared/pages/under-development/under-development.component';
 
 const routes: Routes = [
@@ -13,8 +14,7 @@ const routes: Routes = [
   // Rutas de autenticación (solo para usuarios no logueados)
   {
     path: 'auth',
-    loadChildren: () => import('./features/auth/auth.module').then(m => m.AuthModule),
-    // canActivate: [NonAuthGuard] // Opcional: guard para evitar que usuarios logueados accedan al login
+    loadChildren: () => import('./features/auth/auth.module').then(m => m.AuthModule)
   },
   
   // Dashboard principal (área protegida por defecto después del login)
@@ -28,7 +28,11 @@ const routes: Routes = [
   {
     path: 'usuarios',
     loadChildren: () => import('./features/users/users.module').then(m => m.UsersModule),
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard, RoleGuard],
+    data: { 
+      roles: ['ADMIN'],
+      permissions: ['MANAGE_USERS']
+    }
   },
 
   // Rutas para funcionalidades en desarrollo
@@ -41,58 +45,82 @@ const routes: Routes = [
   {
     path: 'mascotas',
     component: UnderDevelopmentComponent,
-    canActivate: [AuthGuard],
-    data: { featureName: 'Gestión de Mascotas' }
+    canActivate: [AuthGuard, RoleGuard],
+    data: { 
+      featureName: 'Gestión de Mascotas',
+      roles: ['ADMIN', 'VETERINARIAN', 'RECEPTIONIST'],
+      permissions: ['MANAGE_PETS']
+    }
   },
   {
     path: 'citas',
     component: UnderDevelopmentComponent,
-    canActivate: [AuthGuard],
-    data: { featureName: 'Sistema de Citas' }
+    canActivate: [AuthGuard, RoleGuard],
+    data: { 
+      featureName: 'Sistema de Citas',
+      roles: ['ADMIN', 'VETERINARIAN', 'RECEPTIONIST'],
+      permissions: ['MANAGE_APPOINTMENTS']
+    }
   },
   {
     path: 'consultas',
     component: UnderDevelopmentComponent,
-    canActivate: [AuthGuard],
-    data: { featureName: 'Gestión de Consultas' }
+    canActivate: [AuthGuard, RoleGuard],
+    data: { 
+      featureName: 'Gestión de Consultas',
+      roles: ['ADMIN', 'VETERINARIAN'],
+      permissions: ['MANAGE_CONSULTATIONS']
+    }
   },
   {
     path: 'inventario',
     component: UnderDevelopmentComponent,
-    canActivate: [AuthGuard],
-    data: { featureName: 'Control de Inventario' }
+    canActivate: [AuthGuard, RoleGuard],
+    data: { 
+      featureName: 'Control de Inventario',
+      roles: ['ADMIN'],
+      permissions: ['MANAGE_INVENTORY']
+    }
   },
   {
     path: 'clientes',
     component: UnderDevelopmentComponent,
-    canActivate: [AuthGuard],
-    data: { featureName: 'Gestión de Clientes' }
+    canActivate: [AuthGuard, RoleGuard],
+    data: { 
+      featureName: 'Gestión de Clientes',
+      roles: ['ADMIN', 'VETERINARIAN', 'RECEPTIONIST'],
+      permissions: ['MANAGE_CUSTOMERS']
+    }
   },
   {
     path: 'configuracion',
     component: UnderDevelopmentComponent,
-    canActivate: [AuthGuard],
-    data: { featureName: 'Configuración del Sistema' }
+    canActivate: [AuthGuard, RoleGuard],
+    data: { 
+      featureName: 'Configuración del Sistema',
+      roles: ['ADMIN'],
+      permissions: ['MANAGE_SETTINGS']
+    }
   },
   
-  // Ruta por defecto - redirige a home para usuarios no autenticados
+  // Ruta por defecto - redirige al dashboard si está autenticado, sino al login
   {
     path: '',
-    redirectTo: '/home',
+    redirectTo: '/dashboard',
     pathMatch: 'full'
   },
   
-  // Ruta wildcard - redirige al home si no encuentra la ruta
+  // Ruta wildcard - redirige al dashboard si está autenticado, sino al login
   {
     path: '**',
-    redirectTo: '/home'
+    redirectTo: '/dashboard'
   }
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes, {
-    enableTracing: false, // Set to true for debugging
-    preloadingStrategy: PreloadAllModules // Opcional: para precargar módulos
+    enableTracing: false, // Deshabilitado después del debugging exitoso
+    preloadingStrategy: PreloadAllModules
   })],
   exports: [RouterModule]
 })

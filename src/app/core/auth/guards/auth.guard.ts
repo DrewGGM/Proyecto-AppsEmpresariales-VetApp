@@ -38,14 +38,32 @@ export class AuthGuard implements CanActivate, CanActivateChild {
         if (isAuthenticated) {
           // Verificar si el token ha expirado
           if (this.authService.isTokenExpired()) {
-            this.authService.logout();
+            this.authService.logout(false);
             this.redirectToLogin(url);
             return false;
           }
+          
           return true;
         } else {
           this.redirectToLogin(url);
           return false;
+        }
+      })
+    );
+  }
+
+  /**
+   * Verifica que el usuario NO esté autenticado (para rutas de auth)
+   */
+  canActivateNonAuth(url: string): Observable<boolean> {
+    return this.authService.isAuthenticated$.pipe(
+      take(1),
+      map(isAuthenticated => {
+        if (isAuthenticated) {
+          this.router.navigate(['/dashboard']);
+          return false;
+        } else {
+          return true;
         }
       })
     );

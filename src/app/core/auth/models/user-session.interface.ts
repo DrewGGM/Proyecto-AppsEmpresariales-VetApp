@@ -8,7 +8,7 @@ export interface UserSession {
   message: string;
   token?: string;
   refreshToken?: string;
-  expiresAt?: Date;
+  expiresAt?: string;
 }
 
 export interface AuthState {

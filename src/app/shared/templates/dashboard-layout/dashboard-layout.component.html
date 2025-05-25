@@ -7,13 +7,8 @@
     <app-icon name="menu"></app-icon>
   </button>
 
-  <!-- Debug info temporal (remover después) -->
-  <div class="debug-info" *ngIf="showDebugInfo">
-    <small>Mobile: {{ isMobile }} | MenuOpen: {{ isMobileMenuOpen }} | Width: {{ getWindowWidth() }}</small>
-  </div>
-
   <!-- Sidebar -->
-  <app-sidebar #sidebar></app-sidebar>
+  <app-sidebar #sidebar (mobileSidebarClosed)="onMobileSidebarClosed()"></app-sidebar>
   
   <!-- Contenido principal -->
   <main class="main-content" [class.sidebar-collapsed]="isSidebarCollapsed">

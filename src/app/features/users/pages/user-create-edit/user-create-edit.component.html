@@ -109,8 +109,10 @@
             [class.success]="email?.valid && (email?.dirty || email?.touched)">
           
           <div class="field-feedback">
-            <div *ngIf="email?.invalid && (email?.dirty || email?.touched)" class="error-message">
-              <app-icon name="error"></app-icon>
+            <div *ngIf="email?.invalid && (email?.dirty || email?.touched)" 
+                 class="error-message"
+                 [class.server-error]="email?.errors?.['serverError'] || email?.errors?.['emailExists']">
+              <app-icon [name]="(email?.errors?.['serverError'] || email?.errors?.['emailExists']) ? 'warning' : 'error'"></app-icon>
               <span>{{ getErrorMessage('email') }}</span>
             </div>
             <div *ngIf="email?.valid && (email?.dirty || email?.touched)" class="success-message">

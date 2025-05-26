@@ -311,14 +311,132 @@ export class UserCreateEditComponent implements OnInit, OnDestroy {
    * Maneja errores del envío
    */
   private handleSubmitError(error: any): void {
+    console.error('🚨 Error details:', error);
+    
+    // Limpiar errores previos del formulario
+    this.clearFormErrors();
+    
     if (error.status === 409) {
-      this.toastService.error('El email ya está en uso por otro usuario');
+      // Conflicto - Email duplicado
+      this.toastService.error('El email ya está registrado por otro usuario');
       this.userForm.get('email')?.setErrors({ emailExists: true });
+      this.userForm.get('email')?.markAsTouched();
     } else if (error.status === 400) {
-      this.toastService.error('Datos inválidos. Verifica el formulario');
+      // Datos inválidos - Procesar errores específicos del backend
+      this.handleValidationErrors(error);
+    } else if (error.status === 422) {
+      // Entidad no procesable - Errores de validación específicos
+      this.handleValidationErrors(error);
+    } else if (error.status === 0) {
+      // Error de conexión
+      this.toastService.error('No se puede conectar con el servidor. Verifica tu conexión.');
+    } else if (error.status === 500) {
+      // Error interno del servidor
+      this.toastService.error('Error interno del servidor. Intenta nuevamente en unos momentos.');
     } else {
-      this.toastService.error(`Error al ${this.isEditMode ? 'actualizar' : 'crear'} el usuario`);
+      // Error genérico
+      const errorMessage = error.error?.message || `Error al ${this.isEditMode ? 'actualizar' : 'crear'} el usuario`;
+      this.toastService.error(errorMessage);
     }
+  }
+
+  /**
+   * Maneja errores de validación específicos del backend
+   */
+  private handleValidationErrors(error: any): void {
+    const errorData = error.error;
+    let hasSpecificErrors = false;
+    
+    // Si el backend envía errores específicos por campo
+    if (errorData?.errors && typeof errorData.errors === 'object') {
+      Object.keys(errorData.errors).forEach(fieldName => {
+        const fieldError = errorData.errors[fieldName];
+        const formControl = this.userForm.get(fieldName);
+        
+        if (formControl) {
+          hasSpecificErrors = true;
+          
+          // Determinar el tipo de error basado en el mensaje
+          let errorType = 'serverError';
+          if (fieldError.includes('email') && fieldError.includes('uso')) {
+            errorType = 'emailExists';
+          } else if (fieldError.includes('requerido') || fieldError.includes('obligatorio')) {
+            errorType = 'required';
+          } else if (fieldError.includes('formato') || fieldError.includes('válido')) {
+            errorType = 'format';
+          }
+          
+          formControl.setErrors({ [errorType]: true, serverMessage: fieldError });
+          formControl.markAsTouched();
+        }
+      });
+    }
+    
+    // Si el backend envía un array de errores
+    else if (errorData?.errors && Array.isArray(errorData.errors)) {
+      errorData.errors.forEach((errorMsg: string) => {
+        if (errorMsg.toLowerCase().includes('email')) {
+          hasSpecificErrors = true;
+          this.userForm.get('email')?.setErrors({ serverError: true, serverMessage: errorMsg });
+          this.userForm.get('email')?.markAsTouched();
+        } else if (errorMsg.toLowerCase().includes('nombre')) {
+          hasSpecificErrors = true;
+          this.userForm.get('name')?.setErrors({ serverError: true, serverMessage: errorMsg });
+          this.userForm.get('name')?.markAsTouched();
+        } else if (errorMsg.toLowerCase().includes('apellido')) {
+          hasSpecificErrors = true;
+          this.userForm.get('lastName')?.setErrors({ serverError: true, serverMessage: errorMsg });
+          this.userForm.get('lastName')?.markAsTouched();
+        } else if (errorMsg.toLowerCase().includes('contraseña') || errorMsg.toLowerCase().includes('password')) {
+          hasSpecificErrors = true;
+          this.userForm.get('password')?.setErrors({ serverError: true, serverMessage: errorMsg });
+          this.userForm.get('password')?.markAsTouched();
+        } else if (errorMsg.toLowerCase().includes('rol')) {
+          hasSpecificErrors = true;
+          this.userForm.get('role')?.setErrors({ serverError: true, serverMessage: errorMsg });
+          this.userForm.get('role')?.markAsTouched();
+        }
+      });
+    }
+    
+    // Mensaje específico basado en el contenido del error
+    if (errorData?.message) {
+      if (errorData.message.toLowerCase().includes('email')) {
+        this.toastService.error('Error en el email: ' + errorData.message);
+        if (!hasSpecificErrors) {
+          this.userForm.get('email')?.setErrors({ serverError: true, serverMessage: errorData.message });
+          this.userForm.get('email')?.markAsTouched();
+        }
+      } else if (errorData.message.toLowerCase().includes('duplicado') || errorData.message.toLowerCase().includes('existe')) {
+        this.toastService.error('El email ya está registrado por otro usuario');
+        this.userForm.get('email')?.setErrors({ emailExists: true });
+        this.userForm.get('email')?.markAsTouched();
+      } else {
+        this.toastService.error(errorData.message);
+      }
+    } else if (hasSpecificErrors) {
+      this.toastService.error('Por favor, corrige los errores marcados en el formulario');
+    } else {
+      this.toastService.error('Datos inválidos. Verifica la información ingresada');
+    }
+  }
+
+  /**
+   * Limpia errores previos del formulario
+   */
+  private clearFormErrors(): void {
+    Object.keys(this.userForm.controls).forEach(key => {
+      const control = this.userForm.get(key);
+      if (control?.errors) {
+        // Mantener errores de validación del frontend, limpiar solo errores del servidor
+        const errors = { ...control.errors };
+        delete errors['serverError'];
+        delete errors['emailExists'];
+        delete errors['serverMessage'];
+        
+        control.setErrors(Object.keys(errors).length > 0 ? errors : null);
+      }
+    });
   }
 
   /**
@@ -371,6 +489,11 @@ export class UserCreateEditComponent implements OnInit, OnDestroy {
 
     const errors = field.errors;
 
+    // Priorizar mensajes del servidor si existen
+    if (errors['serverMessage']) {
+      return errors['serverMessage'];
+    }
+
     switch (fieldName) {
       case 'name':
       case 'lastName':
@@ -378,29 +501,39 @@ export class UserCreateEditComponent implements OnInit, OnDestroy {
         if (errors['minlength']) return `Mínimo ${errors['minlength'].requiredLength} caracteres`;
         if (errors['maxlength']) return `Máximo ${errors['maxlength'].requiredLength} caracteres`;
         if (errors['pattern']) return 'Solo se permiten letras y espacios';
+        if (errors['serverError']) return 'Error en el campo nombre/apellido';
         break;
 
       case 'email':
         if (errors['required']) return 'Email es obligatorio';
-        if (errors['email']) return 'Format de email inválido';
+        if (errors['email']) return 'Formato de email inválido';
         if (errors['maxlength']) return 'Máximo 100 caracteres';
-        if (errors['emailExists']) return 'Este email ya está en uso';
+        if (errors['emailExists']) return 'Este email ya está registrado por otro usuario';
+        if (errors['serverError']) return 'Error en el email';
         break;
 
       case 'password':
         if (errors['required']) return 'Contraseña es obligatoria';
         if (errors['minlength']) return 'Mínimo 8 caracteres';
         if (errors['pattern']) return 'Debe contener mayúscula, minúscula, número y símbolo';
+        if (errors['serverError']) return 'Error en la contraseña';
         break;
 
       case 'confirmPassword':
         if (errors['required']) return 'Confirmar contraseña es obligatorio';
         if (errors['passwordMismatch']) return 'Las contraseñas no coinciden';
+        if (errors['serverError']) return 'Error en la confirmación de contraseña';
         break;
 
       case 'role':
         if (errors['required']) return 'Rol es obligatorio';
+        if (errors['serverError']) return 'Error en el rol seleccionado';
         break;
+    }
+
+    // Mensaje genérico para errores del servidor no específicos
+    if (errors['serverError']) {
+      return 'Error en este campo';
     }
 
     return 'Campo inválido';
@@ -430,5 +563,37 @@ export class UserCreateEditComponent implements OnInit, OnDestroy {
     if (!this.role?.value) return '';
     const selectedRole = this.roles.find(r => r.value === this.role?.value);
     return selectedRole?.description || '';
+  }
+
+  /**
+   * Método de desarrollo para probar diferentes tipos de errores
+   * TODO: Remover en producción
+   */
+  private testErrorHandling(): void {
+    // Simular diferentes tipos de errores para testing
+    const testErrors = [
+      {
+        status: 409,
+        error: { message: 'El email ya está en uso por otro usuario' }
+      },
+      {
+        status: 400,
+        error: { 
+          message: 'Datos inválidos',
+          errors: {
+            email: 'El formato del email no es válido',
+            name: 'El nombre es demasiado corto'
+          }
+        }
+      },
+      {
+        status: 422,
+        error: {
+          errors: ['El email ya está registrado', 'La contraseña no cumple los requisitos']
+        }
+      }
+    ];
+    
+    // Usar solo para testing: this.handleSubmitError(testErrors[0]);
   }
 }

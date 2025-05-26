@@ -1,3 +1,4 @@
+@use "sass:color";
 @use 'variables' as *;
 
 .user-detail-page {
@@ -370,7 +371,7 @@
             margin: 0 0 $spacing-sm 0;
             font-size: $font-size-md;
             font-weight: $font-weight-medium;
-            color: darken($warning, 15%);
+            color: color.adjust($warning, $lightness: -15%);
             
             app-icon {
               color: $warning;
@@ -389,7 +390,7 @@
               align-items: center;
               padding: $spacing-xs 0;
               font-size: $font-size-sm;
-              color: darken($warning, 20%);
+              color: color.adjust($warning, $lightness: -20%);
               
               .restriction-icon {
                 color: $warning;

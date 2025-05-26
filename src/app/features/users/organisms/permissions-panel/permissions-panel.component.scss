@@ -1,3 +1,4 @@
+@use "sass:color";
 @use 'variables' as *;
 
 .permissions-panel {
@@ -84,7 +85,7 @@
         
         &.restricted {
           background-color: rgba($warning, 0.1);
-          color: darken($warning, 15%);
+          color: color.adjust($warning, $lightness: -15%);
         }
       }
     }

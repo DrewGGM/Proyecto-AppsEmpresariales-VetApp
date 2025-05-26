@@ -1,3 +1,4 @@
+@use "sass:color";
 @use '../../../../../assets/styles/base/variables' as *;
 
 .home-page {
@@ -99,7 +100,7 @@
           ::ng-deep {
             // Botón primario (Iniciar Sesión)
             .btn-primary {
-              background: linear-gradient(135deg, $accent 0%, darken($accent, 10%) 100%) !important;
+              background: linear-gradient(135deg, $accent 0%, color.adjust($accent, $lightness: -10%) 100%) !important;
               border: 2px solid $accent !important;
               color: $neutral-dark !important;
               font-weight: $font-weight-bold;
@@ -107,7 +108,7 @@
               transition: all 0.3s ease;
               
               &:hover {
-                background: linear-gradient(135deg, lighten($accent, 5%) 0%, $accent 100%) !important;
+                background: linear-gradient(135deg, color.adjust($accent, $lightness: 5%) 0%, $accent 100%) !important;
                 transform: translateY(-2px);
                 box-shadow: 0 6px 20px rgba($accent, 0.4);
               }
@@ -277,7 +278,7 @@
   // Stats Section
   .stats-section {
     padding: $spacing-3xl 0;
-    background: linear-gradient(135deg, $neutral-dark 0%, darken($neutral-dark, 10%) 100%);
+    background: linear-gradient(135deg, $neutral-dark 0%, color.adjust($neutral-dark, $lightness: -10%) 100%);
     color: $neutral-light;
 
     .stats-grid {
@@ -422,7 +423,7 @@
         app-button {
           ::ng-deep {
             .btn-primary {
-              background: linear-gradient(135deg, $accent 0%, darken($accent, 10%) 100%) !important;
+              background: linear-gradient(135deg, $accent 0%, color.adjust($accent, $lightness: -10%) 100%) !important;
               border: 2px solid $accent !important;
               color: $neutral-dark !important;
               font-weight: $font-weight-bold;
@@ -430,7 +431,7 @@
               transition: all 0.3s ease;
               
               &:hover {
-                background: linear-gradient(135deg, lighten($accent, 5%) 0%, $accent 100%) !important;
+                background: linear-gradient(135deg, color.adjust($accent, $lightness: 5%) 0%, $accent 100%) !important;
                 transform: translateY(-2px);
                 box-shadow: 0 6px 20px rgba($accent, 0.4);
               }
@@ -540,11 +541,11 @@
 @media (prefers-color-scheme: dark) {
   .home-page {
     .features-section {
-      background: darken($neutral-bg, 5%);
+      background: color.adjust($neutral-bg, $lightness: -5%);
     }
 
     .faq-section {
-      background: darken($neutral-light, 5%);
+      background: color.adjust($neutral-light, $lightness: -5%);
     }
   }
 } 

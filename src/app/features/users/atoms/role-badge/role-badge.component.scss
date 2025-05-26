@@ -1,3 +1,4 @@
+@use "sass:color";
 @use 'variables' as *;
 
 .role-badge {
@@ -21,6 +22,6 @@
   
   &.role-receptionist {
     background-color: rgba($warning, 0.15);
-    color: darken($warning, 10%);
+    color: color.adjust($warning, $lightness: -10%);
   }
 }
